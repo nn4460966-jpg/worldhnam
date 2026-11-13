@@ -1,0 +1,475 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WORLDHNAM</title>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
+<style>
+*{box-sizing:border-box}
+body{margin:0;overflow:hidden;background:#020914;color:#d9faff;font-family:Arial,sans-serif}
+#scene{position:fixed;inset:0;width:100%;height:100%}
+.top{position:fixed;z-index:3;top:20px;left:25px;right:25px;display:flex;justify-content:space-between;align-items:center;pointer-events:none}
+.logo{font-size:20px;font-weight:bold;letter-spacing:5px;color:#65edff;text-shadow:0 0 18px #00cfff}
+.logo small{display:block;font-size:9px;letter-spacing:3px;margin-top:7px;color:#78aebf}
+.status{font-size:10px;letter-spacing:2px;border:1px solid #16b8d9;padding:10px 15px;background:#031c2bcc;color:#6cf2ff}
+.status:before{content:"●";color:#4dffc5;margin-right:9px}
+.panel{position:fixed;z-index:3;background:linear-gradient(145deg,#05283bdf,#031322e8);border:1px solid #087e9c;box-shadow:0 0 25px #00bfff16;backdrop-filter:blur(12px)}
+.left{top:105px;left:22px;width:205px;padding:16px}
+.right{top:105px;right:22px;width:210px;padding:16px}
+h3{font-size:10px;letter-spacing:2px;color:#56eaff;margin:0 0 15px}
+.nav{width:100%;display:block;text-align:left;padding:13px 10px;margin:6px 0;background:#06304788;border:1px solid transparent;color:#b9dce8;cursor:pointer;font-size:10px;letter-spacing:1px}
+.nav:hover,.nav.active{border-color:#26dfff;background:#07516a;color:white;box-shadow:0 0 15px #00bfff28}
+.nav span{color:#4deaff;margin-right:10px}
+.stat{padding:12px 0;border-top:1px solid #1d8ca544}
+.stat small{display:block;color:#79aabd;font-size:9px;letter-spacing:1px}
+.stat strong{display:block;color:#e1fbff;font-size:20px;margin-top:6px}
+.stat em{font-size:9px;color:#4dffc5;font-style:normal}
+.bottom{position:fixed;z-index:3;bottom:20px;left:50%;transform:translateX(-50%);display:flex;gap:5px;padding:8px;background:#031522df;border:1px solid #087e9c;max-width:95vw;overflow-x:auto}
+.mode{background:transparent;border:1px solid transparent;color:#80b7c8;padding:11px 14px;white-space:nowrap;font-size:9px;letter-spacing:1px;cursor:pointer}
+.mode.active,.mode:hover{border-color:#39e5ff;color:white;background:#07516a}
+.hint{position:fixed;bottom:82px;left:50%;transform:translateX(-50%);font-size:9px;color:#71a9bb;letter-spacing:2px;white-space:nowrap;z-index:2}
+#loading{position:fixed;inset:0;background:#020914;z-index:10;display:grid;place-items:center;color:#54eaff;letter-spacing:5px;transition:opacity .8s}
+.loader{width:160px;height:2px;background:#12364a;margin:20px auto;overflow:hidden}
+.loader:after{content:"";display:block;width:40%;height:100%;background:#4deaff;animation:load 1s infinite}
+@keyframes load{to{transform:translateX(400%)}}
+@media(max-width:700px){
+.left{left:8px;top:85px;width:145px;padding:9px}
+.right{right:8px;top:auto;bottom:80px;width:145px;padding:9px}
+.nav{font-size:8px;padding:9px 5px}
+.stat strong{font-size:15px}
+.status{font-size:8px;padding:7px}
+.logo{font-size:15px}
+.bottom{bottom:8px}
+.hint{display:none}
+}
+</style>
+</head>
+
+<body>
+<div id="loading">
+ <div style="text-align:center">
+  WORLDHNAM
+  <div class="loader"></div>
+  <small style="font-size:9px;letter-spacing:2px">INITIALIZING 3D WORLD</small>
+ </div>
+</div>
+
+<canvas id="scene"></canvas>
+
+<header class="top">
+ <div class="logo">WORLDHNAM<small>GLOBAL DIGITAL ENVIRONMENT</small></div>
+ <div class="status">SYSTEM ONLINE // 3D MODE</div>
+</header>
+
+<aside class="panel left">
+ <h3>◆ NAVIGATION SYSTEM</h3>
+ <button class="nav active" data-mode="overview"><span>◈</span> GLOBAL OVERVIEW</button>
+ <button class="nav" data-mode="radar"><span>◎</span> PROXIMITY RADAR</button>
+ <button class="nav" data-mode="analytics"><span>▥</span> DATA ANALYTICS</button>
+ <button class="nav" data-mode="room"><span>⌂</span> COMMAND CENTER</button>
+ <button class="nav" data-mode="detector"><span>⌁</span> DETECTOR ARRAY</button>
+</aside>
+
+<aside class="panel right">
+ <h3 id="infoTitle">WORLD STATUS // LIVE</h3>
+ <div class="stat"><small>CONNECTED NODES</small><strong id="nodes">3,613,979</strong><em>+2.4%</em></div>
+ <div class="stat"><small>NETWORK COVERAGE</small><strong id="coverage">98.72%</strong></div>
+ <div class="stat"><small>ACTIVE SIGNALS</small><strong id="signals">1,284</strong></div>
+ <div class="stat"><small>ENVIRONMENT</small><strong style="font-size:13px">STABLE</strong></div>
+</aside>
+
+<div class="hint">DRAG TO ROTATE · SCROLL TO ZOOM · RIGHT CLICK TO PAN</div>
+
+<nav class="bottom">
+ <button class="mode active" data-mode="overview">01 OVERVIEW</button>
+ <button class="mode" data-mode="radar">02 RADAR</button>
+ <button class="mode" data-mode="analytics">03 ANALYTICS</button>
+ <button class="mode" data-mode="room">04 COMMAND ROOM</button>
+ <button class="mode" data-mode="detector">05 DETECTOR</button>
+ <button class="mode" id="reset">↺ RESET VIEW</button>
+</nav>
+
+<script type="module">
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+const canvas=document.querySelector("#scene");
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.setSize(innerWidth,innerHeight);
+renderer.setClearColor(0x020914);
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+
+const scene=new THREE.Scene();
+scene.fog=new THREE.FogExp2(0x020914,.016);
+
+const camera=new THREE.PerspectiveCamera(48,innerWidth/innerHeight,.1,300);
+camera.position.set(0,13,27);
+
+const controls=new OrbitControls(camera,renderer.domElement);
+controls.enableDamping=true;
+controls.dampingFactor=.06;
+controls.minDistance=7;
+controls.maxDistance=60;
+controls.target.set(0,4,0);
+
+scene.add(new THREE.AmbientLight(0x65cfff,.8));
+
+const light=new THREE.PointLight(0x16cfff,100,100);
+light.position.set(0,15,5);
+scene.add(light);
+
+const world=new THREE.Group();
+scene.add(world);
+
+// FLOOR
+const floor=new THREE.Mesh(
+ new THREE.PlaneGeometry(180,180),
+ new THREE.MeshStandardMaterial({color:0x031321,metalness:.7,roughness:.5})
+);
+floor.rotation.x=-Math.PI/2;
+floor.position.y=-.1;
+world.add(floor);
+
+const grid=new THREE.GridHelper(160,100,0x087e9b,0x07334a);
+grid.position.y=-.08;
+world.add(grid);
+
+// FLOOR RINGS
+for(let i=0;i<5;i++){
+ const ring=new THREE.Mesh(
+  new THREE.TorusGeometry(7+i*2,.018,6,160),
+  new THREE.MeshBasicMaterial({color:0x12bfe9,transparent:true,opacity:.3})
+ );
+ ring.rotation.x=Math.PI/2;
+ ring.position.y=.02;
+ world.add(ring);
+}
+
+// CENTRAL PLATFORM
+const platform=new THREE.Group();
+world.add(platform);
+
+const base=new THREE.Mesh(
+ new THREE.CylinderGeometry(5,5.7,.45,8),
+ new THREE.MeshStandardMaterial({
+  color:0x06384b,emissive:0x006b8a,
+  emissiveIntensity:1,metalness:.8,roughness:.25
+ })
+);
+base.position.y=.4;
+platform.add(base);
+
+const platformRing=new THREE.Mesh(
+ new THREE.TorusGeometry(4.7,.055,8,120),
+ new THREE.MeshBasicMaterial({color:0x4deaff})
+);
+platformRing.rotation.x=Math.PI/2;
+platformRing.position.y=.68;
+platform.add(platformRing);
+
+// GLOBE
+const globeGroup=new THREE.Group();
+globeGroup.position.y=7.2;
+world.add(globeGroup);
+
+const globe=new THREE.Mesh(
+ new THREE.SphereGeometry(3.3,48,36),
+ new THREE.MeshBasicMaterial({
+  color:0x12b9e2,wireframe:true,transparent:true,opacity:.52
+ })
+);
+globeGroup.add(globe);
+
+const shell=new THREE.Mesh(
+ new THREE.SphereGeometry(3.27,40,32),
+ new THREE.MeshBasicMaterial({
+  color:0x047b9e,transparent:true,opacity:.12
+ })
+);
+globeGroup.add(shell);
+
+for(let i=0;i<3;i++){
+ const orbit=new THREE.Mesh(
+  new THREE.TorusGeometry(3.65+i*.25,.025,8,160),
+  new THREE.MeshBasicMaterial({color:0x4deaff,transparent:true,opacity:.7})
+ );
+ orbit.rotation.set(i*.8,0,i*.45);
+ globeGroup.add(orbit);
+}
+
+// LIGHT POINTS ON GLOBE
+const dots=new THREE.Group();
+globeGroup.add(dots);
+
+for(let i=0;i<100;i++){
+ const phi=Math.acos(2*Math.random()-1);
+ const theta=Math.random()*Math.PI*2;
+ const dot=new THREE.Mesh(
+  new THREE.SphereGeometry(.035,8,8),
+  new THREE.MeshBasicMaterial({color:i%5===0?0x7affdc:0x31dfff})
+ );
+ dot.position.set(
+  3.32*Math.sin(phi)*Math.cos(theta),
+  3.32*Math.cos(phi),
+  3.32*Math.sin(phi)*Math.sin(theta)
+ );
+ dots.add(dot);
+}
+
+// HOLOGRAM PANELS
+const panels=new THREE.Group();
+world.add(panels);
+
+function createPanel(x,y,z,w,h){
+ const g=new THREE.Group();
+ g.position.set(x,y,z);
+ g.lookAt(0,5,0);
+
+ const bg=new THREE.Mesh(
+  new THREE.PlaneGeometry(w,h),
+  new THREE.MeshBasicMaterial({
+   color:0x06304a,transparent:true,opacity:.48,
+   side:THREE.DoubleSide
+  })
+ );
+ g.add(bg);
+
+ const edge=new THREE.LineSegments(
+  new THREE.EdgesGeometry(new THREE.PlaneGeometry(w,h)),
+  new THREE.LineBasicMaterial({color:0x39dfff})
+ );
+ g.add(edge);
+
+ for(let i=0;i<6;i++){
+  const width=w*(.3+Math.random()*.55);
+  const bar=new THREE.Mesh(
+   new THREE.PlaneGeometry(width,.035),
+   new THREE.MeshBasicMaterial({color:0x28cce9})
+  );
+  bar.position.set(-w*.5+width*.5,h*.3-i*h*.12,.025);
+  g.add(bar);
+ }
+
+ panels.add(g);
+}
+
+createPanel(-8,7,-2,4.5,3.2);
+createPanel(8,7,-2,4.5,3.2);
+createPanel(-7,3,3,3.4,2.3);
+createPanel(7,3,3,3.4,2.3);
+createPanel(0,10,-8,5,2.4);
+
+// COMMAND ROOM
+const room=new THREE.Group();
+world.add(room);
+
+for(let i=0;i<16;i++){
+ const a=i*Math.PI/8;
+ const x=Math.cos(a)*14;
+ const z=Math.sin(a)*14;
+
+ const pillar=new THREE.Mesh(
+  new THREE.BoxGeometry(.3,8,.3),
+  new THREE.MeshBasicMaterial({color:0x087e9b,transparent:true,opacity:.55})
+ );
+ pillar.position.set(x,4,z);
+ room.add(pillar);
+
+ const lamp=new THREE.Mesh(
+  new THREE.BoxGeometry(.5,.04,.5),
+  new THREE.MeshBasicMaterial({color:0x4deaff})
+ );
+ lamp.position.set(x,7.9,z);
+ room.add(lamp);
+}
+
+// DESKS
+for(let i=0;i<8;i++){
+ const a=i*Math.PI/4;
+ const desk=new THREE.Group();
+ desk.position.set(Math.cos(a)*10,0,Math.sin(a)*10);
+ desk.rotation.y=-a;
+
+ const table=new THREE.Mesh(
+  new THREE.BoxGeometry(2.5,.25,1.4),
+  new THREE.MeshStandardMaterial({color:0x071e2c,metalness:.8})
+ );
+ table.position.y=1;
+ desk.add(table);
+
+ const screen=new THREE.Mesh(
+  new THREE.PlaneGeometry(1.8,.9),
+  new THREE.MeshBasicMaterial({
+   color:0x12bce4,transparent:true,opacity:.65,
+   side:THREE.DoubleSide
+  })
+ );
+ screen.position.set(0,1.8,-.35);
+ desk.add(screen);
+
+ room.add(desk);
+}
+
+// RADAR
+const radar=new THREE.Group();
+world.add(radar);
+
+for(let i=1;i<=5;i++){
+ const circle=new THREE.Mesh(
+  new THREE.RingGeometry(i-.015,i+.015,120),
+  new THREE.MeshBasicMaterial({
+   color:0x20c9ed,transparent:true,opacity:.5,
+   side:THREE.DoubleSide
+  })
+ );
+ circle.rotation.x=-Math.PI/2;
+ radar.add(circle);
+}
+
+const sweep=new THREE.Mesh(
+ new THREE.CircleGeometry(5,.1,0,Math.PI/3),
+ new THREE.MeshBasicMaterial({
+  color:0x2deaff,transparent:true,opacity:.2,
+  side:THREE.DoubleSide
+ })
+);
+sweep.rotation.x=-Math.PI/2;
+sweep.position.y=.04;
+radar.add(sweep);
+
+// ANALYTICS
+const analytics=new THREE.Group();
+world.add(analytics);
+
+for(let i=0;i<18;i++){
+ const h=.5+Math.random()*4;
+ const bar=new THREE.Mesh(
+  new THREE.BoxGeometry(.25,h,.25),
+  new THREE.MeshBasicMaterial({color:i%3===0?0x54ffe0:0x13aeca})
+ );
+ bar.position.set(-4.5+i*.55,h/2,0);
+ analytics.add(bar);
+}
+analytics.position.set(0,.1,-5);
+
+// PARTICLES
+const particlePositions=[];
+for(let i=0;i<1000;i++){
+ particlePositions.push(
+  (Math.random()-.5)*80,
+  Math.random()*25,
+  (Math.random()-.5)*80
+ );
+}
+
+const particleGeo=new THREE.BufferGeometry();
+particleGeo.setAttribute(
+ "position",
+ new THREE.Float32BufferAttribute(particlePositions,3)
+);
+
+const particles=new THREE.Points(
+ particleGeo,
+ new THREE.PointsMaterial({color:0x3bcfea,size:.045,transparent:true,opacity:.65})
+);
+world.add(particles);
+
+// CHANGE VIEW
+function setMode(mode){
+ document.querySelectorAll("[data-mode]").forEach(b=>{
+  b.classList.toggle("active",b.dataset.mode===mode);
+ });
+
+ globeGroup.visible=mode!=="room";
+ panels.visible=mode==="overview"||mode==="detector";
+ radar.visible=mode==="radar";
+ analytics.visible=mode==="analytics";
+ room.visible=mode==="room";
+
+ const names={
+  overview:"WORLD STATUS // LIVE",
+  radar:"RADAR ARRAY // SCAN",
+  analytics:"DATA ANALYTICS // FEED",
+  room:"COMMAND CENTER // ACTIVE",
+  detector:"DETECTOR ARRAY // ACTIVE"
+ };
+
+ document.querySelector("#infoTitle").textContent=names[mode];
+
+ if(mode==="radar"){
+  camera.position.set(0,25,1);
+  controls.target.set(0,0,0);
+ }else if(mode==="room"){
+  camera.position.set(0,11,25);
+  controls.target.set(0,3,0);
+ }else if(mode==="analytics"){
+  camera.position.set(0,12,22);
+  controls.target.set(0,2,0);
+ }else{
+  camera.position.set(0,13,27);
+  controls.target.set(0,4,0);
+ }
+
+ controls.update();
+}
+
+document.querySelectorAll("[data-mode]").forEach(b=>{
+ b.addEventListener("click",()=>setMode(b.dataset.mode));
+});
+
+document.querySelector("#reset").addEventListener("click",()=>{
+ setMode("overview");
+});
+
+// ANIMATION
+const clock=new THREE.Clock();
+
+function animate(){
+ requestAnimationFrame(animate);
+ const t=clock.getElapsedTime();
+
+ globeGroup.rotation.y=t*.12;
+ dots.rotation.y=-t*.06;
+ platform.rotation.y=t*.08;
+ sweep.rotation.z=-t*.5;
+ particles.rotation.y=t*.006;
+
+ panels.children.forEach((p,i)=>{
+  p.position.y=[7,7,3,3,10][i]+Math.sin(t*.8+i)*.12;
+ });
+
+ controls.update();
+ renderer.render(scene,camera);
+}
+
+animate();
+
+// RESPONSIVE
+window.addEventListener("resize",()=>{
+ camera.aspect=innerWidth/innerHeight;
+ camera.updateProjectionMatrix();
+ renderer.setSize(innerWidth,innerHeight);
+ renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+});
+
+// LOADING
+setTimeout(()=>{
+ const loading=document.querySelector("#loading");
+ loading.style.opacity="0";
+ setTimeout(()=>loading.remove(),900);
+},1200);
+</script>
+</body>
+</html>
