@@ -3,9 +3,8 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WORLDHNAM</title>
-
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WORLDHNAM — Holographic Command Deck</title>
 <script type="importmap">
 {
   "imports": {
@@ -14,462 +13,485 @@
   }
 }
 </script>
-
 <style>
 *{box-sizing:border-box}
-body{margin:0;overflow:hidden;background:#020914;color:#d9faff;font-family:Arial,sans-serif}
-#scene{position:fixed;inset:0;width:100%;height:100%}
-.top{position:fixed;z-index:3;top:20px;left:25px;right:25px;display:flex;justify-content:space-between;align-items:center;pointer-events:none}
-.logo{font-size:20px;font-weight:bold;letter-spacing:5px;color:#65edff;text-shadow:0 0 18px #00cfff}
-.logo small{display:block;font-size:9px;letter-spacing:3px;margin-top:7px;color:#78aebf}
-.status{font-size:10px;letter-spacing:2px;border:1px solid #16b8d9;padding:10px 15px;background:#031c2bcc;color:#6cf2ff}
-.status:before{content:"●";color:#4dffc5;margin-right:9px}
-.panel{position:fixed;z-index:3;background:linear-gradient(145deg,#05283bdf,#031322e8);border:1px solid #087e9c;box-shadow:0 0 25px #00bfff16;backdrop-filter:blur(12px)}
-.left{top:105px;left:22px;width:205px;padding:16px}
-.right{top:105px;right:22px;width:210px;padding:16px}
-h3{font-size:10px;letter-spacing:2px;color:#56eaff;margin:0 0 15px}
-.nav{width:100%;display:block;text-align:left;padding:13px 10px;margin:6px 0;background:#06304788;border:1px solid transparent;color:#b9dce8;cursor:pointer;font-size:10px;letter-spacing:1px}
-.nav:hover,.nav.active{border-color:#26dfff;background:#07516a;color:white;box-shadow:0 0 15px #00bfff28}
-.nav span{color:#4deaff;margin-right:10px}
-.stat{padding:12px 0;border-top:1px solid #1d8ca544}
-.stat small{display:block;color:#79aabd;font-size:9px;letter-spacing:1px}
-.stat strong{display:block;color:#e1fbff;font-size:20px;margin-top:6px}
-.stat em{font-size:9px;color:#4dffc5;font-style:normal}
-.bottom{position:fixed;z-index:3;bottom:20px;left:50%;transform:translateX(-50%);display:flex;gap:5px;padding:8px;background:#031522df;border:1px solid #087e9c;max-width:95vw;overflow-x:auto}
-.mode{background:transparent;border:1px solid transparent;color:#80b7c8;padding:11px 14px;white-space:nowrap;font-size:9px;letter-spacing:1px;cursor:pointer}
-.mode.active,.mode:hover{border-color:#39e5ff;color:white;background:#07516a}
-.hint{position:fixed;bottom:82px;left:50%;transform:translateX(-50%);font-size:9px;color:#71a9bb;letter-spacing:2px;white-space:nowrap;z-index:2}
-#loading{position:fixed;inset:0;background:#020914;z-index:10;display:grid;place-items:center;color:#54eaff;letter-spacing:5px;transition:opacity .8s}
-.loader{width:160px;height:2px;background:#12364a;margin:20px auto;overflow:hidden}
-.loader:after{content:"";display:block;width:40%;height:100%;background:#4deaff;animation:load 1s infinite}
-@keyframes load{to{transform:translateX(400%)}}
-@media(max-width:700px){
-.left{left:8px;top:85px;width:145px;padding:9px}
-.right{right:8px;top:auto;bottom:80px;width:145px;padding:9px}
-.nav{font-size:8px;padding:9px 5px}
-.stat strong{font-size:15px}
-.status{font-size:8px;padding:7px}
-.logo{font-size:15px}
-.bottom{bottom:8px}
-.hint{display:none}
+:root{--cyan:#54edff;--blue:#08a9db;--bg:#020811}
+body{margin:0;background:var(--bg);color:#c9f8ff;font-family:Arial,sans-serif;overflow:hidden}
+#scene{position:fixed;inset:0;width:100%;height:100%;display:block}
+.hud{position:fixed;z-index:5;pointer-events:none;text-shadow:0 0 10px #00cfff}
+.brand{top:16px;left:20px;font-size:10px;letter-spacing:3px;color:#67eaff}
+.brand b{font-size:13px;letter-spacing:4px}
+.brand small{display:block;margin-top:6px;font-size:7px;letter-spacing:2px;color:#5795a8}
+.topright{top:16px;right:18px;display:flex;gap:8px;pointer-events:auto}
+.hudbtn,.nav button,.bottom button{background:#031724c9;border:1px solid #17647b;color:#8cd9e8;cursor:pointer;letter-spacing:1px}
+.hudbtn{padding:9px 14px;border-radius:20px;font-size:9px}
+.hudbtn:hover,.nav button:hover,.bottom button:hover,.active{background:#087c99!important;color:white!important;border-color:#5af1ff!important;box-shadow:0 0 16px #00cfff55}
+.nav{position:fixed;z-index:5;left:18px;top:105px;width:120px;background:#031521b8;border:1px solid #12506a;padding:9px;backdrop-filter:blur(10px)}
+.navhead{font-size:7px;letter-spacing:2px;color:#5b9eaf;margin:0 0 10px}
+.nav button{display:block;width:100%;padding:9px 5px;margin:4px 0;text-align:left;font-size:7px;border-color:transparent;background:#041c2b99}
+.nav button span{color:var(--cyan);margin-right:5px}
+.bottom{position:fixed;z-index:5;bottom:22px;left:50%;transform:translateX(-50%);display:flex;gap:4px;padding:5px;background:#03121ddd;border:1px solid #15536b;pointer-events:auto}
+.bottom button{padding:10px 13px;font-size:8px;border-color:transparent;white-space:nowrap}
+.footer{position:fixed;z-index:4;bottom:8px;left:16px;font-size:7px;letter-spacing:1px;color:#5d9eae;pointer-events:none}
+.coords{position:fixed;right:18px;bottom:45px;font-size:8px;line-height:1.8;color:#69b6c7;text-align:right;pointer-events:none}
+.hint{position:fixed;bottom:72px;left:50%;transform:translateX(-50%);font-size:7px;letter-spacing:2px;color:#6baabd;white-space:nowrap;pointer-events:none}
+.overlay{position:fixed;z-index:3;inset:0;display:none;align-items:center;justify-content:center;background:#01091466;pointer-events:none}
+.overlay.show{display:flex}
+.dataPanel{width:min(760px,84vw);max-height:78vh;overflow:auto;background:linear-gradient(145deg,#0a3044ed,#041421f5);border:1px solid #47d9ee;box-shadow:0 0 55px #00bde955;padding:24px;pointer-events:auto;backdrop-filter:blur(15px)}
+.panelTitle{font-size:16px;letter-spacing:2px;color:#b8f8ff;border-bottom:1px solid #2a8194;padding-bottom:13px;margin-bottom:17px}
+.panelTitle small{float:right;color:#5dffcb;font-size:9px}
+.metrics{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.metric{background:#061c2b;border:1px solid #17485a;padding:12px}
+.metric small{display:block;color:#6ca6b8;font-size:7px;letter-spacing:1px}
+.metric b{display:block;font-size:19px;margin-top:8px;color:#c9faff}
+.dataGrid{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:18px;margin-top:22px}
+.dataGrid h4{font-size:8px;letter-spacing:2px;color:#65cfe0}
+.barline{height:7px;background:#123348;margin:13px 0;position:relative}
+.barline i{display:block;height:100%;background:linear-gradient(90deg,#168ba8,#8dfaff);box-shadow:0 0 9px #29dffb}
+.country{display:flex;justify-content:space-between;font-size:9px;color:#a8dbe6;margin:12px 0}
+.radarBox{width:min(560px,80vw);aspect-ratio:1;background:#0b3448c9;border:1px solid #5deeff;position:relative;display:grid;place-items:center;box-shadow:0 0 70px #00cfff44}
+.radarBox:before,.radarBox:after{content:"";position:absolute;border:1px solid #56ddeb66;border-radius:50%;width:72%;height:72%}
+.radarBox:after{width:42%;height:42%}
+.radarCircle{position:absolute;width:90%;height:90%;border:1px solid #49dbea44;border-radius:50%;background:conic-gradient(from 0deg,transparent 0 80%,#39eaff44 100%);animation:spin 5s linear infinite}
+.radarCenter{width:8px;height:8px;border-radius:50%;background:#fff;box-shadow:0 0 18px 8px #27dfff;z-index:1}
+.radarLabel{position:absolute;top:16px;left:18px;font-size:12px;letter-spacing:2px}
+.dot{position:absolute;width:9px;height:9px;border-radius:50%;background:#65edff;box-shadow:0 0 14px 5px #19d9ff}
+@keyframes spin{to{transform:rotate(360deg)}}
+#loading{position:fixed;z-index:10;inset:0;background:#020811;display:grid;place-items:center;color:#64efff;letter-spacing:5px;transition:opacity .8s}
+.loadbar{height:2px;width:180px;background:#12374b;margin:18px auto;overflow:hidden}
+.loadbar:after{content:"";display:block;width:40%;height:100%;background:#61f1ff;animation:load 1s infinite}
+@keyframes load{to{transform:translateX(250%)}}
+@media(max-width:650px){
+ .nav{top:80px;left:7px;width:105px;padding:6px}
+ .nav button{font-size:6px;padding:8px 3px}
+ .brand{top:12px;left:10px}
+ .topright{right:7px;top:10px}
+ .hudbtn{font-size:7px;padding:7px}
+ .bottom{bottom:10px;width:96vw;overflow-x:auto;justify-content:flex-start}
+ .bottom button{font-size:7px;padding:9px}
+ .hint,.coords{display:none}
+ .metrics{grid-template-columns:repeat(2,1fr)}
+ .dataGrid{grid-template-columns:1fr}
+ .dataPanel{padding:13px}
 }
 </style>
 </head>
-
 <body>
-<div id="loading">
- <div style="text-align:center">
-  WORLDHNAM
-  <div class="loader"></div>
-  <small style="font-size:9px;letter-spacing:2px">INITIALIZING 3D WORLD</small>
+<div id="loading"><div style="text-align:center">WORLDHNAM<div class="loadbar"></div><small style="font-size:8px">INITIALIZING HOLOGRAPHIC ENVIRONMENT</small></div></div>
+<canvas id="scene"></canvas>
+
+<div class="hud brand"><b>WORLDHNAM</b><small>HOLOGRAPHIC COMMAND DECK</small></div>
+<div class="hud topright">
+ <button class="hudbtn" id="dataBtn">▤ DATA</button>
+ <button class="hudbtn" id="exitBtn">× EXIT</button>
+</div>
+
+<aside class="nav">
+ <div class="navhead">◆ COMMAND DECK</div>
+ <button data-mode="office"><span>◇</span> 03 HEAD OFFICE</button>
+ <button data-mode="operations"><span>◇</span> 02 OPERATIONS</button>
+ <button data-mode="overview" class="active"><span>◆</span> 01 COMMAND DECK</button>
+</aside>
+
+<div class="coords">RATE　44,025 /s<br>THREAT　05<br>DETECTORS　9,870<br>ACTIVE　1,284</div>
+<div class="hint">DRAG TO ROTATE · SCROLL TO ZOOM · RIGHT CLICK TO PAN</div>
+<div class="footer">◆ DECK ONLINE　·　SECTOR 07　·　NO ALERTS</div>
+
+<nav class="bottom">
+ <button class="active" data-mode="overview">01 COMMS</button>
+ <button data-mode="radar">02 RADAR</button>
+ <button data-mode="analytics">03 DATA</button>
+ <button data-mode="room">04 COMMAND</button>
+ <button data-mode="office">05 OFFICE</button>
+ <button data-mode="detector">06 DETECTOR</button>
+ <button id="reset">↺ RESET</button>
+</nav>
+
+<div class="overlay" id="radarOverlay">
+ <div class="radarBox">
+  <div class="radarLabel">PROXIMITY RADAR // 400KM</div>
+  <div class="radarCircle"></div><div class="radarCenter"></div>
+  <i class="dot" style="top:29%;left:58%"></i>
+  <i class="dot" style="top:39%;left:37%"></i>
+  <i class="dot" style="top:54%;left:68%;background:#ff548e"></i>
+  <i class="dot" style="top:68%;left:44%"></i>
+  <i class="dot" style="top:25%;left:43%"></i>
  </div>
 </div>
 
-<canvas id="scene"></canvas>
-
-<header class="top">
- <div class="logo">WORLDHNAM<small>GLOBAL DIGITAL ENVIRONMENT</small></div>
- <div class="status">SYSTEM ONLINE // 3D MODE</div>
-</header>
-
-<aside class="panel left">
- <h3>◆ NAVIGATION SYSTEM</h3>
- <button class="nav active" data-mode="overview"><span>◈</span> GLOBAL OVERVIEW</button>
- <button class="nav" data-mode="radar"><span>◎</span> PROXIMITY RADAR</button>
- <button class="nav" data-mode="analytics"><span>▥</span> DATA ANALYTICS</button>
- <button class="nav" data-mode="room"><span>⌂</span> COMMAND CENTER</button>
- <button class="nav" data-mode="detector"><span>⌁</span> DETECTOR ARRAY</button>
-</aside>
-
-<aside class="panel right">
- <h3 id="infoTitle">WORLD STATUS // LIVE</h3>
- <div class="stat"><small>CONNECTED NODES</small><strong id="nodes">3,613,979</strong><em>+2.4%</em></div>
- <div class="stat"><small>NETWORK COVERAGE</small><strong id="coverage">98.72%</strong></div>
- <div class="stat"><small>ACTIVE SIGNALS</small><strong id="signals">1,284</strong></div>
- <div class="stat"><small>ENVIRONMENT</small><strong style="font-size:13px">STABLE</strong></div>
-</aside>
-
-<div class="hint">DRAG TO ROTATE · SCROLL TO ZOOM · RIGHT CLICK TO PAN</div>
-
-<nav class="bottom">
- <button class="mode active" data-mode="overview">01 OVERVIEW</button>
- <button class="mode" data-mode="radar">02 RADAR</button>
- <button class="mode" data-mode="analytics">03 ANALYTICS</button>
- <button class="mode" data-mode="room">04 COMMAND ROOM</button>
- <button class="mode" data-mode="detector">05 DETECTOR</button>
- <button class="mode" id="reset">↺ RESET VIEW</button>
-</nav>
+<div class="overlay" id="analyticsOverlay">
+ <div class="dataPanel">
+  <div class="panelTitle">LIVE THREAT DATA <small>● SYSTEM LIVE</small></div>
+  <div class="metrics">
+   <div class="metric"><small>SESSIONS · LAST 7 DAYS</small><b>3,613,979</b></div>
+   <div class="metric"><small>ATTACKER IPS</small><b>9,870</b></div>
+   <div class="metric"><small>DETECTORS</small><b>13</b></div>
+   <div class="metric"><small>SESSIONS · ALL</small><b>4,012,084</b></div>
+   <div class="metric"><small>ACTIVE IPS</small><b>27,257</b></div>
+  </div>
+  <div class="dataGrid">
+   <section><h4>TOP ATTACKERS</h4>
+    <div class="country">US <span>28,269</span></div><div class="barline"><i style="width:90%"></i></div>
+    <div class="country">DE <span>18,088</span></div><div class="barline"><i style="width:70%"></i></div>
+    <div class="country">NL <span>11,918</span></div><div class="barline"><i style="width:50%"></i></div>
+    <div class="country">FR <span>11,296</span></div><div class="barline"><i style="width:42%"></i></div>
+   </section>
+   <section><h4>COUNTRIES</h4>
+    <div class="country">United States <span>86,841</span></div><div class="barline"><i style="width:95%"></i></div>
+    <div class="country">Germany <span>40,476</span></div><div class="barline"><i style="width:65%"></i></div>
+    <div class="country">United Kingdom <span>33,057</span></div><div class="barline"><i style="width:55%"></i></div>
+    <div class="country">Vietnam <span>25,870</span></div><div class="barline"><i style="width:43%"></i></div>
+   </section>
+   <section><h4>PORT ACTIVITY</h4>
+    <div class="country">3389 <span>ACTIVE</span></div><div class="barline"><i style="width:88%"></i></div>
+    <div class="country">443 <span>STABLE</span></div><div class="barline"><i style="width:60%"></i></div>
+    <div class="country">445 <span>STABLE</span></div><div class="barline"><i style="width:38%"></i></div>
+    <div class="country">8080 <span>MONITOR</span></div><div class="barline"><i style="width:22%"></i></div>
+   </section>
+  </div>
+ </div>
+</div>
 
 <script type="module">
 import * as THREE from "three";
-import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import {OrbitControls} from "three/addons/controls/OrbitControls.js";
 
 const canvas=document.querySelector("#scene");
 const renderer=new THREE.WebGLRenderer({canvas,antialias:true});
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));
 renderer.setSize(innerWidth,innerHeight);
-renderer.setClearColor(0x020914);
+renderer.setClearColor(0x020811);
 renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=1.35;
 
 const scene=new THREE.Scene();
-scene.fog=new THREE.FogExp2(0x020914,.016);
-
-const camera=new THREE.PerspectiveCamera(48,innerWidth/innerHeight,.1,300);
-camera.position.set(0,13,27);
-
+scene.fog=new THREE.FogExp2(0x020811,.009);
+const camera=new THREE.PerspectiveCamera(52,innerWidth/innerHeight,.1,500);
+camera.position.set(0,12,27);
 const controls=new OrbitControls(camera,renderer.domElement);
-controls.enableDamping=true;
-controls.dampingFactor=.06;
-controls.minDistance=7;
-controls.maxDistance=60;
+controls.enableDamping=true;controls.dampingFactor=.055;
+controls.minDistance=3;controls.maxDistance=75;
 controls.target.set(0,4,0);
+controls.maxPolarAngle=Math.PI*.88;
 
-scene.add(new THREE.AmbientLight(0x65cfff,.8));
+scene.add(new THREE.AmbientLight(0x6bcfff,1.15));
+const keyLight=new THREE.PointLight(0x14dfff,170,100);
+keyLight.position.set(0,16,3);scene.add(keyLight);
+const rimLight=new THREE.PointLight(0x087bff,100,90);
+rimLight.position.set(-15,8,-12);scene.add(rimLight);
 
-const light=new THREE.PointLight(0x16cfff,100,100);
-light.position.set(0,15,5);
-scene.add(light);
+const world=new THREE.Group();scene.add(world);
+const room=new THREE.Group();scene.add(room);
+const towers=new THREE.Group();scene.add(towers);
+const holo=new THREE.Group();scene.add(holo);
+const radar3d=new THREE.Group();scene.add(radar3d);
+const analytics3d=new THREE.Group();scene.add(analytics3d);
 
-const world=new THREE.Group();
-scene.add(world);
-
-// FLOOR
-const floor=new THREE.Mesh(
- new THREE.PlaneGeometry(180,180),
- new THREE.MeshStandardMaterial({color:0x031321,metalness:.7,roughness:.5})
-);
-floor.rotation.x=-Math.PI/2;
-floor.position.y=-.1;
-world.add(floor);
-
-const grid=new THREE.GridHelper(160,100,0x087e9b,0x07334a);
-grid.position.y=-.08;
-world.add(grid);
-
-// FLOOR RINGS
-for(let i=0;i<5;i++){
- const ring=new THREE.Mesh(
-  new THREE.TorusGeometry(7+i*2,.018,6,160),
-  new THREE.MeshBasicMaterial({color:0x12bfe9,transparent:true,opacity:.3})
- );
- ring.rotation.x=Math.PI/2;
- ring.position.y=.02;
- world.add(ring);
+function mat(color,emissive=color,roughness=.35,metalness=.55){
+ return new THREE.MeshStandardMaterial({color,emissive,emissiveIntensity:.65,roughness,metalness});
+}
+function line(points,color=0x4deaff,opacity=.8){
+ const g=new THREE.BufferGeometry().setFromPoints(points);
+ const l=new THREE.Line(g,new THREE.LineBasicMaterial({color,transparent:true,opacity}));
+ return l;
+}
+function box(parent,w,h,d,x,y,z,material){
+ const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material);
+ m.position.set(x,y,z);parent.add(m);return m;
+}
+function glowRing(parent,r,t,y,color=0x42eaff){
+ const m=new THREE.Mesh(new THREE.TorusGeometry(r,t,8,150),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.8}));
+ m.rotation.x=Math.PI/2;m.position.y=y;parent.add(m);return m;
 }
 
-// CENTRAL PLATFORM
-const platform=new THREE.Group();
-world.add(platform);
+// FLOOR AND GRID
+const floor=box(world,180,.12,180,0,-.18,0,mat(0x031522,0x00111c,.65,.8));
+const grid=new THREE.GridHelper(180,100,0x087d9c,0x124057);
+grid.position.y=-.1;world.add(grid);
+for(let r=7;r<=24;r+=3)glowRing(world,r,.018,.01,0x0c7e9f);
 
-const base=new THREE.Mesh(
- new THREE.CylinderGeometry(5,5.7,.45,8),
- new THREE.MeshStandardMaterial({
-  color:0x06384b,emissive:0x006b8a,
-  emissiveIntensity:1,metalness:.8,roughness:.25
- })
-);
-base.position.y=.4;
-platform.add(base);
+// CENTRAL HOLOGRAM PLATFORM
+const base= new THREE.Group();world.add(base);
+const pl= new THREE.Mesh(new THREE.CylinderGeometry(5.8,6.6,.75,6),mat(0x06465b,0x00a9d6,.22,.85));
+pl.position.y=.45;base.add(pl);
+const pl2=new THREE.Mesh(new THREE.CylinderGeometry(4.9,5.6,.15,6),mat(0x087c99,0x00dfff,.2,.8));
+pl2.position.y=.9;base.add(pl2);
+glowRing(base,5.1,.08,1,0x6cf5ff);
+glowRing(base,6.1,.035,.1,0x20cfff);
+const core=new THREE.Mesh(new THREE.OctahedronGeometry(.9,1),new THREE.MeshBasicMaterial({color:0x54efff}));
+core.position.y=1.35;base.add(core);
+const coreLight=new THREE.PointLight(0x00dfff,80,20);coreLight.position.y=2;base.add(coreLight);
 
-const platformRing=new THREE.Mesh(
- new THREE.TorusGeometry(4.7,.055,8,120),
- new THREE.MeshBasicMaterial({color:0x4deaff})
-);
-platformRing.rotation.x=Math.PI/2;
-platformRing.position.y=.68;
-platform.add(platformRing);
-
-// GLOBE
-const globeGroup=new THREE.Group();
-globeGroup.position.y=7.2;
-world.add(globeGroup);
-
-const globe=new THREE.Mesh(
- new THREE.SphereGeometry(3.3,48,36),
- new THREE.MeshBasicMaterial({
-  color:0x12b9e2,wireframe:true,transparent:true,opacity:.52
- })
-);
+// DIGITAL GLOBE
+const globeGroup=new THREE.Group();globeGroup.position.set(0,8.2,0);world.add(globeGroup);
+const globe=new THREE.Mesh(new THREE.SphereGeometry(4.2,64,48),new THREE.MeshBasicMaterial({color:0x1abbdc,wireframe:true,transparent:true,opacity:.32}));
 globeGroup.add(globe);
-
-const shell=new THREE.Mesh(
- new THREE.SphereGeometry(3.27,40,32),
- new THREE.MeshBasicMaterial({
-  color:0x047b9e,transparent:true,opacity:.12
- })
-);
+const shell=new THREE.Mesh(new THREE.SphereGeometry(4.12,48,40),new THREE.MeshBasicMaterial({color:0x087da7,transparent:true,opacity:.14}));
 globeGroup.add(shell);
-
+const pointGeo=new THREE.BufferGeometry(),pts=[];
+for(let i=0;i<2400;i++){
+ const y=1-2*(i+.5)/2400,rad=Math.sqrt(1-y*y),a=Math.PI*(3-Math.sqrt(5))*i;
+ pts.push(4.17*Math.cos(a)*rad,4.17*y,4.17*Math.sin(a)*rad);
+}
+pointGeo.setAttribute("position",new THREE.Float32BufferAttribute(pts,3));
+const globeDots=new THREE.Points(pointGeo,new THREE.PointsMaterial({color:0x73f5ff,size:.045,transparent:true,opacity:.9}));
+globeGroup.add(globeDots);
 for(let i=0;i<3;i++){
- const orbit=new THREE.Mesh(
-  new THREE.TorusGeometry(3.65+i*.25,.025,8,160),
-  new THREE.MeshBasicMaterial({color:0x4deaff,transparent:true,opacity:.7})
- );
- orbit.rotation.set(i*.8,0,i*.45);
- globeGroup.add(orbit);
+ const ring=new THREE.Mesh(new THREE.TorusGeometry(4.7+i*.38,.025,8,180),new THREE.MeshBasicMaterial({color:0x45eaff,transparent:true,opacity:.75}));
+ ring.rotation.set(i*.8,.2,i*.6);globeGroup.add(ring);
 }
 
-// LIGHT POINTS ON GLOBE
-const dots=new THREE.Group();
-globeGroup.add(dots);
-
-for(let i=0;i<100;i++){
- const phi=Math.acos(2*Math.random()-1);
- const theta=Math.random()*Math.PI*2;
- const dot=new THREE.Mesh(
-  new THREE.SphereGeometry(.035,8,8),
-  new THREE.MeshBasicMaterial({color:i%5===0?0x7affdc:0x31dfff})
- );
- dot.position.set(
-  3.32*Math.sin(phi)*Math.cos(theta),
-  3.32*Math.cos(phi),
-  3.32*Math.sin(phi)*Math.sin(theta)
- );
- dots.add(dot);
-}
-
-// HOLOGRAM PANELS
-const panels=new THREE.Group();
-world.add(panels);
-
-function createPanel(x,y,z,w,h){
- const g=new THREE.Group();
- g.position.set(x,y,z);
- g.lookAt(0,5,0);
-
- const bg=new THREE.Mesh(
-  new THREE.PlaneGeometry(w,h),
-  new THREE.MeshBasicMaterial({
-   color:0x06304a,transparent:true,opacity:.48,
-   side:THREE.DoubleSide
-  })
- );
- g.add(bg);
-
- const edge=new THREE.LineSegments(
-  new THREE.EdgesGeometry(new THREE.PlaneGeometry(w,h)),
-  new THREE.LineBasicMaterial({color:0x39dfff})
- );
- g.add(edge);
-
- for(let i=0;i<6;i++){
-  const width=w*(.3+Math.random()*.55);
-  const bar=new THREE.Mesh(
-   new THREE.PlaneGeometry(width,.035),
-   new THREE.MeshBasicMaterial({color:0x28cce9})
-  );
-  bar.position.set(-w*.5+width*.5,h*.3-i*h*.12,.025);
-  g.add(bar);
+// HOLOGRAPHIC PANEL TEXTURES
+function screenTexture(title,kind=0){
+ const c=document.createElement("canvas");c.width=640;c.height=420;
+ const x=c.getContext("2d");
+ x.fillStyle="#062538";x.fillRect(0,0,640,420);
+ x.strokeStyle="#4deaff";x.lineWidth=2;x.strokeRect(8,8,624,404);
+ x.fillStyle="#a9f6ff";x.font="bold 23px Arial";x.fillText(title,28,48);
+ x.fillStyle="#54dff3";x.font="12px Arial";x.fillText("WORLDHNAM // LIVE SYSTEM",28,72);
+ x.strokeStyle="#287e98";x.beginPath();x.moveTo(25,90);x.lineTo(615,90);x.stroke();
+ if(kind===1){
+  for(let i=0;i<9;i++){
+   x.fillStyle=i===2?"#ff5d91":"#4bd8ee";
+   x.fillRect(35,125+i*29,180+Math.random()*260,9);
+   x.fillStyle="#9bdce8";x.font="12px Arial";x.fillText("NODE 0"+(i+1),35,118+i*29);
+  }
+ }else if(kind===2){
+  for(let i=0;i<14;i++){
+   let h=35+Math.random()*190;
+   x.fillStyle=i===3?"#f3b45a":"#48d8ed";
+   x.fillRect(40+i*39,360-h,20,h);
+  }
+ }else{
+  x.strokeStyle="#54eaff";x.lineWidth=2;
+  x.beginPath();
+  for(let i=0;i<35;i++){
+   const px=35+i*16,py=240+Math.sin(i*.5)*55+Math.random()*18;
+   if(i===0)x.moveTo(px,py);else x.lineTo(px,py);
+  }x.stroke();
+  for(let i=0;i<6;i++){
+   x.fillStyle="#55eaff";x.fillRect(35,120+i*37,120+Math.random()*300,5);
+  }
  }
+ return new THREE.CanvasTexture(c);
+}
+function makeHolo(x,y,z,w,h,title,kind=0){
+ const g=new THREE.Group();g.position.set(x,y,z);g.lookAt(0,6,0);
+ const screen=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({map:screenTexture(title,kind),transparent:true,opacity:.86,side:THREE.DoubleSide}));
+ g.add(screen);
+ const frame=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.PlaneGeometry(w,h)),new THREE.LineBasicMaterial({color:0x4deaff}));
+ g.add(frame);holo.add(g);return g;
+}
+const panels=[
+ makeHolo(-9,8,-3,5,3.2,"NETWORK / STATUS",0),
+ makeHolo(9,8,-3,5,3.2,"GLOBAL ACTIVITY",1),
+ makeHolo(-8,4,5,4,2.7,"LIVE FEED",2),
+ makeHolo(8,4,5,4,2.7,"WORLD MAP",1),
+ makeHolo(0,12,-10,5.5,3,"SYSTEM MONITOR",0)
+];
 
- panels.add(g);
+// HOLOGRAM TOWERS
+for(let i=0;i<26;i++){
+ const a=i*Math.PI*2/26,r=13+Math.random()*8,x=Math.cos(a)*r,z=Math.sin(a)*r,h=2+Math.random()*8;
+ const tower=new THREE.Group();tower.position.set(x,0,z);
+ const edges=new THREE.EdgesGeometry(new THREE.BoxGeometry(1,h,1));
+ tower.add(new THREE.LineSegments(edges,new THREE.LineBasicMaterial({color:0x1684a8,transparent:true,opacity:.65})));
+ const dots=new THREE.Points(new THREE.BufferGeometry(),new THREE.PointsMaterial({color:0x39cde9,size:.045}));
+ const p=[];for(let j=0;j<80;j++)p.push((Math.random()-.5)*.9,Math.random()*h,(Math.random()-.5)*.9);
+ dots.geometry.setAttribute("position",new THREE.Float32BufferAttribute(p,3));tower.add(dots);
+ towers.add(tower);
 }
 
-createPanel(-8,7,-2,4.5,3.2);
-createPanel(8,7,-2,4.5,3.2);
-createPanel(-7,3,3,3.4,2.3);
-createPanel(7,3,3,3.4,2.3);
-createPanel(0,10,-8,5,2.4);
-
-// COMMAND ROOM
-const room=new THREE.Group();
-world.add(room);
-
-for(let i=0;i<16;i++){
- const a=i*Math.PI/8;
- const x=Math.cos(a)*14;
- const z=Math.sin(a)*14;
-
- const pillar=new THREE.Mesh(
-  new THREE.BoxGeometry(.3,8,.3),
-  new THREE.MeshBasicMaterial({color:0x087e9b,transparent:true,opacity:.55})
- );
- pillar.position.set(x,4,z);
- room.add(pillar);
-
- const lamp=new THREE.Mesh(
-  new THREE.BoxGeometry(.5,.04,.5),
-  new THREE.MeshBasicMaterial({color:0x4deaff})
- );
- lamp.position.set(x,7.9,z);
- room.add(lamp);
+// SIGNAL NODES
+const nodes=new THREE.Group();world.add(nodes);
+for(let i=0;i<12;i++){
+ const a=i*Math.PI/6,r=10+Math.random()*4,x=Math.cos(a)*r,z=Math.sin(a)*r;
+ const n=new THREE.Group();n.position.set(x,.15,z);
+ const ring=new THREE.Mesh(new THREE.TorusGeometry(.55,.035,8,60),new THREE.MeshBasicMaterial({color:i%2?0x149bff:0x49efff}));
+ ring.rotation.x=Math.PI/2;n.add(ring);
+ const orb=new THREE.Mesh(new THREE.SphereGeometry(.22,16,12),new THREE.MeshBasicMaterial({color:i%2?0x188dff:0x52faff}));
+ orb.position.y=.3;n.add(orb);nodes.add(n);
 }
 
-// DESKS
+// COMMAND ROOM ENVIRONMENT
+const roomFloor=new THREE.Mesh(new THREE.CylinderGeometry(22,22,.3,64),mat(0x061522,0x00101a,.35,.8));
+roomFloor.position.y=-.25;room.add(roomFloor);
+glowRing(room,22,.09,-.02,0x43edff);
+glowRing(room,17,.025,.02,0x168cb7);
+const ceiling=new THREE.Group();room.add(ceiling);
+for(let i=-3;i<=3;i++){
+ const beam=box(ceiling,.08,.08,38,i*5,12,0,mat(0x087e9b,0x16b8d5));
+ const beam2=box(ceiling,38,.08,.08,0,12,i*5,mat(0x087e9b,0x16b8d5));
+}
+glowRing(ceiling,7,.12,12,0x5af5ff);
+
+// Central command table
+const commandBase=box(room,7,.55,4,0,1,0,mat(0x061c2b,0x087c99,.2,.9));
+const commandTop=box(room,7.5,.12,4.5,0,1.32,0,mat(0x0b3b50,0x00aaca,.18,.8));
+const centerScreen=new THREE.Mesh(new THREE.PlaneGeometry(5,1.4),new THREE.MeshBasicMaterial({map:screenTexture("ATTACK MAP / LIVE",1),transparent:true,side:THREE.DoubleSide}));
+centerScreen.position.set(0,2.7,-1.3);room.add(centerScreen);
+const centerGlobe=new THREE.Group();centerGlobe.position.set(0,6,0);room.add(centerGlobe);
+const cg=new THREE.Mesh(new THREE.SphereGeometry(2.2,40,32),new THREE.MeshBasicMaterial({color:0x62efff,wireframe:true,transparent:true,opacity:.8}));
+centerGlobe.add(cg);
+glowRing(centerGlobe,2.7,.035,0,0x64f4ff);
+const cgl=new THREE.PointLight(0x00cfff,70,16);centerGlobe.add(cgl);
+
+// WORKSTATIONS, CHAIRS AND ROBOT-LIKE OPERATORS
+function makeChair(parent,x,z,rot=0){
+ const g=new THREE.Group();g.position.set(x,0,z);g.rotation.y=rot;parent.add(g);
+ box(g,1.15,.18,1,0,1,0,mat(0x07121d,0x00101a));
+ box(g,1.1,1.6,.16,0,1.85,-.4,mat(0x071725,0x06354a));
+ box(g,.12,.7,.12,-.43,.5,0,mat(0x0b3c50));
+ box(g,.12,.7,.12,.43,.5,0,mat(0x0b3c50));
+ glowRing(g,.48,.035,.2,0x3beaff);
+}
+function makeOperator(parent,x,z){
+ const g=new THREE.Group();g.position.set(x,0,z);parent.add(g);
+ const torso=box(g,.65,1,.4,0,1.6,0,mat(0x101e2c,0x07364b));
+ const head=box(g,.58,.48,.5,0,2.45,0,mat(0x102b3b,0x0a6d8c));
+ const visor=box(g,.42,.09,.035,0,2.48,.27,new THREE.MeshBasicMaterial({color:0x55f4ff}));
+ const eye=new THREE.PointLight(0x39eaff,8,3);eye.position.set(0,2.5,.5);g.add(eye);
+ box(g,.22,.8,.22,-.45,1.6,0,mat(0x0a2837));
+ box(g,.22,.8,.22,.45,1.6,0,mat(0x0a2837));
+ box(g,.25,.9,.3,-.2,.5,0,mat(0x071521));
+ box(g,.25,.9,.3,.2,.5,0,mat(0x071521));
+ glowRing(g,.38,.035,1.1,0x53edff);
+}
 for(let i=0;i<8;i++){
- const a=i*Math.PI/4;
- const desk=new THREE.Group();
- desk.position.set(Math.cos(a)*10,0,Math.sin(a)*10);
- desk.rotation.y=-a;
-
- const table=new THREE.Mesh(
-  new THREE.BoxGeometry(2.5,.25,1.4),
-  new THREE.MeshStandardMaterial({color:0x071e2c,metalness:.8})
- );
- table.position.y=1;
- desk.add(table);
-
- const screen=new THREE.Mesh(
-  new THREE.PlaneGeometry(1.8,.9),
-  new THREE.MeshBasicMaterial({
-   color:0x12bce4,transparent:true,opacity:.65,
-   side:THREE.DoubleSide
-  })
- );
- screen.position.set(0,1.8,-.35);
- desk.add(screen);
-
- room.add(desk);
+ const a=i*Math.PI/4,x=Math.cos(a)*12,z=Math.sin(a)*12;
+ const g=new THREE.Group();g.position.set(x,0,z);g.rotation.y=-a+Math.PI;room.add(g);
+ box(g,3,.22,1.7,0,1.35,0,mat(0x071b2a,0x07506a,.2,.8));
+ const monitor=new THREE.Mesh(new THREE.PlaneGeometry(2.5,1.25),new THREE.MeshBasicMaterial({map:screenTexture("SYSTEM FEED",i%3),side:THREE.DoubleSide}));
+ monitor.position.set(0,2.45,-.55);g.add(monitor);
+ makeChair(g,0,1.4,0);
+ makeOperator(g,0,1.1);
 }
 
-// RADAR
-const radar=new THREE.Group();
-world.add(radar);
-
-for(let i=1;i<=5;i++){
- const circle=new THREE.Mesh(
-  new THREE.RingGeometry(i-.015,i+.015,120),
-  new THREE.MeshBasicMaterial({
-   color:0x20c9ed,transparent:true,opacity:.5,
-   side:THREE.DoubleSide
-  })
- );
- circle.rotation.x=-Math.PI/2;
- radar.add(circle);
+// OFFICE SCENE
+const office=new THREE.Group();scene.add(office);
+const officeFloor=box(office,35,.2,35,0,-.2,0,mat(0x071b2a,0x00101b));
+for(let i=-3;i<=3;i+=2){
+ box(office,.06,8,35,i*4,4,0,mat(0x0b4054,0x06435a));
+ box(office,35,.06,.06,0,4,i*4,mat(0x0b4054,0x06435a));
+}
+for(let i=0;i<4;i++){
+ const x=(i-1.5)*7;
+ box(office,3,.25,1.8,x,1,0,mat(0x071d2a,0x07516a));
+ const m=new THREE.Mesh(new THREE.PlaneGeometry(2.5,1.3),new THREE.MeshBasicMaterial({map:screenTexture("HEAD OFFICE",i%3),side:THREE.DoubleSide}));
+ m.position.set(x,2.2,-.5);office.add(m);
+ makeChair(office,x,2,0);
+ makeOperator(office,x,2);
+}
+for(let i=0;i<4;i++){
+ const bar=box(office,.3,2+i*.8,.3,12+i,1+i*.4,-8,mat(0x0b8aaf,0x0b8aaf));
 }
 
-const sweep=new THREE.Mesh(
- new THREE.CircleGeometry(5,.1,0,Math.PI/3),
- new THREE.MeshBasicMaterial({
-  color:0x2deaff,transparent:true,opacity:.2,
-  side:THREE.DoubleSide
- })
-);
-sweep.rotation.x=-Math.PI/2;
-sweep.position.y=.04;
-radar.add(sweep);
-
-// ANALYTICS
-const analytics=new THREE.Group();
-world.add(analytics);
-
+// RADAR 3D
+for(let i=1;i<=6;i++){
+ const r=new THREE.Mesh(new THREE.RingGeometry(i-.015,i+.015,128),new THREE.MeshBasicMaterial({color:0x30dfff,transparent:true,opacity:.55,side:THREE.DoubleSide}));
+ r.rotation.x=-Math.PI/2;r.position.y=.04;radar3d.add(r);
+}
+const radarSweep=new THREE.Mesh(new THREE.CircleGeometry(6,64,0,Math.PI/3),new THREE.MeshBasicMaterial({color:0x35eaff,transparent:true,opacity:.2,side:THREE.DoubleSide}));
+radarSweep.rotation.x=-Math.PI/2;radarSweep.position.y=.06;radar3d.add(radarSweep);
 for(let i=0;i<18;i++){
- const h=.5+Math.random()*4;
- const bar=new THREE.Mesh(
-  new THREE.BoxGeometry(.25,h,.25),
-  new THREE.MeshBasicMaterial({color:i%3===0?0x54ffe0:0x13aeca})
- );
- bar.position.set(-4.5+i*.55,h/2,0);
- analytics.add(bar);
+ const a=Math.random()*Math.PI*2,r=1+Math.random()*5;
+ const d=new THREE.Mesh(new THREE.SphereGeometry(.12,12,12),new THREE.MeshBasicMaterial({color:i===3?0xff528b:0x65efff}));
+ d.position.set(Math.cos(a)*r,.2,Math.sin(a)*r);radar3d.add(d);
 }
-analytics.position.set(0,.1,-5);
+
+// DATA BAR ARRAY
+for(let i=0;i<20;i++){
+ const h=.5+Math.random()*5;
+ const b=box(analytics3d,.38,h,.38,-6+i*.65,h/2,0,mat(i%5===0?0xd59b48:0x18aeca,i%5===0?0xd59b48:0x18aeca));
+}
+analytics3d.position.set(0,0,-5);
 
 // PARTICLES
 const particlePositions=[];
-for(let i=0;i<1000;i++){
- particlePositions.push(
-  (Math.random()-.5)*80,
-  Math.random()*25,
-  (Math.random()-.5)*80
- );
-}
+for(let i=0;i<1800;i++)particlePositions.push((Math.random()-.5)*100,Math.random()*35,(Math.random()-.5)*100);
+const pg=new THREE.BufferGeometry();pg.setAttribute("position",new THREE.Float32BufferAttribute(particlePositions,3));
+const stars=new THREE.Points(pg,new THREE.PointsMaterial({color:0x3ca9c8,size:.045,transparent:true,opacity:.65}));
+scene.add(stars);
 
-const particleGeo=new THREE.BufferGeometry();
-particleGeo.setAttribute(
- "position",
- new THREE.Float32BufferAttribute(particlePositions,3)
-);
+// MODES
+const modes=["overview","radar","analytics","room","office","operations","detector"];
+let currentMode="overview";
+const radarOverlay=document.querySelector("#radarOverlay");
+const analyticsOverlay=document.querySelector("#analyticsOverlay");
 
-const particles=new THREE.Points(
- particleGeo,
- new THREE.PointsMaterial({color:0x3bcfea,size:.045,transparent:true,opacity:.65})
-);
-world.add(particles);
-
-// CHANGE VIEW
 function setMode(mode){
- document.querySelectorAll("[data-mode]").forEach(b=>{
-  b.classList.toggle("active",b.dataset.mode===mode);
- });
-
- globeGroup.visible=mode!=="room";
- panels.visible=mode==="overview"||mode==="detector";
- radar.visible=mode==="radar";
- analytics.visible=mode==="analytics";
+ currentMode=mode;
+ document.querySelectorAll("[data-mode]").forEach(b=>b.classList.toggle("active",b.dataset.mode===mode));
+ radarOverlay.classList.toggle("show",mode==="radar");
+ analyticsOverlay.classList.toggle("show",mode==="analytics");
+ world.visible=mode==="overview"||mode==="detector"||mode==="operations";
+ globeGroup.visible=mode==="overview"||mode==="operations";
+ holo.visible=mode==="overview"||mode==="operations"||mode==="detector";
+ towers.visible=mode!=="room"&&mode!=="office";
  room.visible=mode==="room";
-
- const names={
-  overview:"WORLD STATUS // LIVE",
-  radar:"RADAR ARRAY // SCAN",
-  analytics:"DATA ANALYTICS // FEED",
-  room:"COMMAND CENTER // ACTIVE",
-  detector:"DETECTOR ARRAY // ACTIVE"
- };
-
- document.querySelector("#infoTitle").textContent=names[mode];
-
+ office.visible=mode==="office";
+ radar3d.visible=mode==="radar";
+ analytics3d.visible=mode==="analytics"||mode==="detector";
+ base.visible=mode==="overview"||mode==="operations";
+ nodes.visible=mode==="overview"||mode==="operations";
  if(mode==="radar"){
-  camera.position.set(0,25,1);
-  controls.target.set(0,0,0);
+  camera.position.set(0,24,.1);controls.target.set(0,0,0);
  }else if(mode==="room"){
-  camera.position.set(0,11,25);
-  controls.target.set(0,3,0);
+  camera.position.set(0,10,28);controls.target.set(0,4,0);
+ }else if(mode==="office"){
+  camera.position.set(0,6,19);controls.target.set(0,2,0);
  }else if(mode==="analytics"){
-  camera.position.set(0,12,22);
-  controls.target.set(0,2,0);
+  camera.position.set(0,11,24);controls.target.set(0,2,0);
+ }else if(mode==="detector"){
+  camera.position.set(0,23,2);controls.target.set(0,1,0);
  }else{
-  camera.position.set(0,13,27);
-  controls.target.set(0,4,0);
+  camera.position.set(0,13,29);controls.target.set(0,5,0);
  }
-
  controls.update();
 }
+document.querySelectorAll("[data-mode]").forEach(b=>b.addEventListener("click",()=>setMode(b.dataset.mode)));
+document.querySelector("#reset").addEventListener("click",()=>setMode("overview"));
+document.querySelector("#dataBtn").addEventListener("click",()=>setMode(currentMode==="analytics"?"overview":"analytics"));
+document.querySelector("#exitBtn").addEventListener("click",()=>setMode("overview"));
 
-document.querySelectorAll("[data-mode]").forEach(b=>{
- b.addEventListener("click",()=>setMode(b.dataset.mode));
-});
-
-document.querySelector("#reset").addEventListener("click",()=>{
- setMode("overview");
-});
+// CAMERA DRAG AND KEYBOARD MOVEMENT
+const keys={};
+window.addEventListener("keydown",e=>keys[e.key.toLowerCase()]=true);
+window.addEventListener("keyup",e=>keys[e.key.toLowerCase()]=false);
+function moveCamera(dt){
+ const speed=dt*7;
+ const forward=new THREE.Vector3();camera.getWorldDirection(forward);forward.y=0;forward.normalize();
+ const right=new THREE.Vector3().crossVectors(forward,camera.up).normalize();
+ if(keys.w||keys.arrowup)camera.position.addScaledVector(forward,speed);
+ if(keys.s||keys.arrowdown)camera.position.addScaledVector(forward,-speed);
+ if(keys.a||keys.arrowleft)camera.position.addScaledVector(right,-speed);
+ if(keys.d||keys.arrowright)camera.position.addScaledVector(right,speed);
+ if(keys.w||keys.s||keys.a||keys.d||keys.arrowup||keys.arrowdown||keys.arrowleft||keys.arrowright)controls.target.addScaledVector(forward,0);
+}
 
 // ANIMATION
 const clock=new THREE.Clock();
-
 function animate(){
  requestAnimationFrame(animate);
- const t=clock.getElapsedTime();
-
+ const t=clock.getElapsedTime(),dt=Math.min(clock.getDelta(),.04);
  globeGroup.rotation.y=t*.12;
- dots.rotation.y=-t*.06;
- platform.rotation.y=t*.08;
- sweep.rotation.z=-t*.5;
- particles.rotation.y=t*.006;
-
- panels.children.forEach((p,i)=>{
-  p.position.y=[7,7,3,3,10][i]+Math.sin(t*.8+i)*.12;
- });
-
+ globeDots.rotation.y=-t*.08;
+ base.rotation.y=t*.06;
+ centerGlobe.rotation.y=t*.18;
+ radarSweep.rotation.z=-t*.6;
+ stars.rotation.y=t*.003;
+ panels.forEach((p,i)=>p.position.y+=Math.sin(t*.7+i)*.0008);
+ nodes.children.forEach((n,i)=>{n.children[0].rotation.z=t*.5+i;n.children[1].position.y=.3+Math.sin(t*2+i)*.1});
  controls.update();
  renderer.render(scene,camera);
 }
-
 animate();
 
-// RESPONSIVE
 window.addEventListener("resize",()=>{
- camera.aspect=innerWidth/innerHeight;
- camera.updateProjectionMatrix();
- renderer.setSize(innerWidth,innerHeight);
- renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+ camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();
+ renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,2));
 });
-
-// LOADING
-setTimeout(()=>{
- const loading=document.querySelector("#loading");
- loading.style.opacity="0";
- setTimeout(()=>loading.remove(),900);
-},1200);
+setTimeout(()=>{const l=document.querySelector("#loading");l.style.opacity=0;setTimeout(()=>l.remove(),850)},1500);
 </script>
 </body>
 </html>
