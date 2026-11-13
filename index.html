@@ -461,9 +461,8 @@ function animate(){
 
  const t=clock.getElapsedTime();
 
-// SMOOTH CAMERA TRANSITION + ZOOM
-const currentDistance=camera.position.distanceTo(controls.target);
 
+// SMOOTH CAMERA TRANSITION + ZOOM
 controls.target.lerp(targetGoal,0.045);
 camera.position.lerp(cameraGoal,0.045);
 
@@ -479,6 +478,8 @@ const zoomDirection=new THREE.Vector3()
 
 camera.position.copy(
   controls.target.clone().addScaledVector(zoomDirection,nextDistance)
+);
+
 );Distance)
  );
 
