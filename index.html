@@ -207,33 +207,204 @@ function ring(parent,r,y,color=0x39dfff,t=.035){
 function grid(parent,size=100,div=70){
  const g=new THREE.GridHelper(size,div,0x147e9e,0x10354c);g.position.y=-.12;parent.add(g);
 }
+
 function makeScreen(parent,x,y,z,w,h,title){
- const c=document.createElement("canvas");c.width=512;c.height=320;
+ const c=document.createElement("canvas");
+ c.width=1024;
+ c.height=640;
+
  const ctx=c.getContext("2d");
- ctx.fillStyle="#06283b";ctx.fillRect(0,0,512,320);
- ctx.strokeStyle="#4eeaff";ctx.strokeRect(5,5,502,310);
- ctx.fillStyle="#b9faff";ctx.font="bold 20px Arial";ctx.fillText(title,22,36);
- ctx.fillStyle="#48d7ec";ctx.font="12px Arial";ctx.fillText("WORLDHNAM // SYSTEM LIVE",22,58);
- ctx.strokeStyle="#3288a1";ctx.beginPath();ctx.moveTo(20,75);ctx.lineTo(490,75);ctx.stroke();
- for(let i=0;i<7;i++){
-  ctx.fillStyle="#1e657d";ctx.fillRect(22,100+i*27,90+Math.random()*220,5);
+
+ // GLASS HOLOGRAM BACKGROUND
+ const bg=ctx.createLinearGradient(0,0,1024,640);
+ bg.addColorStop(0,"rgba(3,32,53,.96)");
+ bg.addColorStop(.5,"rgba(5,70,91,.88)");
+ bg.addColorStop(1,"rgba(2,20,43,.96)");
+
+ ctx.fillStyle=bg;
+ ctx.fillRect(0,0,1024,640);
+
+ // GRID
+ ctx.strokeStyle="rgba(73,220,255,.12)";
+ ctx.lineWidth=1;
+
+ for(let gx=0;gx<1024;gx+=32){
+  ctx.beginPath();
+  ctx.moveTo(gx,0);
+  ctx.lineTo(gx,640);
+  ctx.stroke();
  }
- ctx.strokeStyle="#5af1ff";ctx.beginPath();
- for(let i=0;i<22;i++){
-  let px=25+i*21,py=225+Math.sin(i*.7)*35+Math.random()*12;
-  i?ctx.lineTo(px,py):ctx.moveTo(px,py);
- }ctx.stroke();
+
+ for(let gy=0;gy<640;gy+=32){
+  ctx.beginPath();
+  ctx.moveTo(0,gy);
+  ctx.lineTo(1024,gy);
+  ctx.stroke();
+ }
+
+ // OUTER FRAME
+ ctx.strokeStyle="#5af2ff";
+ ctx.lineWidth=4;
+ ctx.strokeRect(8,8,1008,624);
+
+ ctx.strokeStyle="rgba(80,230,255,.4)";
+ ctx.lineWidth=2;
+ ctx.strokeRect(18,18,988,604);
+
+ // TITLE
+ ctx.fillStyle="#bdfaff";
+ ctx.font="bold 38px Arial";
+ ctx.fillText(title,38,68);
+
+ ctx.fillStyle="#43eaff";
+ ctx.font="20px Arial";
+ ctx.fillText("WORLDHNAM // SYSTEM LIVE",40,105);
+
+ // STATUS INDICATOR
+ ctx.fillStyle="#42ffc7";
+ ctx.beginPath();
+ ctx.arc(960,55,9,0,Math.PI*2);
+ ctx.fill();
+
+ ctx.fillStyle="#83faff";
+ ctx.font="17px Arial";
+ ctx.fillText("ONLINE",880,90);
+
+ // DIVIDER
+ ctx.strokeStyle="#39cfe9";
+ ctx.lineWidth=2;
+ ctx.beginPath();
+ ctx.moveTo(35,125);
+ ctx.lineTo(990,125);
+ ctx.stroke();
+
+ // DATA PANELS
+ for(let i=0;i<4;i++){
+  const x=38+i*245;
+
+  ctx.fillStyle="rgba(18,105,133,.25)";
+  ctx.fillRect(x,150,220,85);
+
+  ctx.strokeStyle="rgba(75,220,255,.5)";
+  ctx.strokeRect(x,150,220,85);
+
+  ctx.fillStyle="#75eaff";
+  ctx.font="17px Arial";
+  ctx.fillText(
+   ["NETWORK","SIGNAL","TRAFFIC","STATUS"][i],
+   x+14,178
+  );
+
+  ctx.fillStyle="#d6fbff";
+  ctx.font="bold 29px Arial";
+  ctx.fillText(
+   ["ACTIVE","STABLE","LIVE","SECURE"][i],
+   x+14,216
+  );
+ }
+
+ // BAR CHART
+ ctx.fillStyle="#9befff";
+ ctx.font="19px Arial";
+ ctx.fillText("SYSTEM PERFORMANCE",40,285);
+
+ for(let i=0;i<8;i++){
+  const bh=45+Math.random()*115;
+  const bx=45+i*65;
+
+  ctx.fillStyle="rgba(38,158,190,.2)";
+  ctx.fillRect(bx,490-bh,38,bh);
+
+  ctx.fillStyle="#42dfff";
+  ctx.fillRect(bx,490-bh,38,5);
+ }
+
+ // LINE GRAPH
+ ctx.strokeStyle="#70f5ff";
+ ctx.lineWidth=4;
+ ctx.beginPath();
+
+ for(let i=0;i<35;i++){
+  const px=580+i*11;
+  const py=420+Math.sin(i*.45)*48+Math.random()*18;
+
+  if(i===0)ctx.moveTo(px,py);
+  else ctx.lineTo(px,py);
+ }
+
+ ctx.stroke();
+
+ // LOWER INFORMATION
+ ctx.strokeStyle="rgba(71,220,255,.5)";
+ ctx.beginPath();
+ ctx.moveTo(35,535);
+ ctx.lineTo(990,535);
+ ctx.stroke();
+
+ ctx.fillStyle="#6beaff";
+ ctx.font="18px Arial";
+ ctx.fillText("GLOBAL MONITORING SYSTEM",40,575);
+ ctx.fillText("REALTIME DATA STREAM",40,605);
+
+ ctx.fillStyle="#42ffc7";
+ ctx.fillText("CONNECTION: ACTIVE",730,575);
+
  const texture=new THREE.CanvasTexture(c);
- const mesh=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({map:texture,side:THREE.DoubleSide}));
- mesh.position.set(x,y,z);parent.add(mesh);
- const frame=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.PlaneGeometry(w,h)),new THREE.LineBasicMaterial({color:0x54eaff}));
+ texture.colorSpace=THREE.SRGBColorSpace;
+
+ const material=new THREE.MeshBasicMaterial({
+  map:texture,
+  transparent:true,
+  opacity:.96,
+  side:THREE.DoubleSide
+ });
+
+ const mesh=new THREE.Mesh(
+  new THREE.PlaneGeometry(w,h),
+  material
+ );
+
+ mesh.position.set(x,y,z);
+ parent.add(mesh);
+
+ // GLOWING FRAME
+ const frameGeometry=new THREE.EdgesGeometry(
+  new THREE.PlaneGeometry(w,h)
+ );
+
+ const frame=new THREE.LineSegments(
+  frameGeometry,
+  new THREE.LineBasicMaterial({
+   color:0x54eaff,
+   transparent:true,
+   opacity:.9
+  })
+ );
+
  frame.position.copy(mesh.position);
-parent.add(frame);
+ parent.add(frame);
 
-mesh.userData.frame=frame;
+ // INNER LIGHT FRAME
+ const innerFrame=new THREE.Mesh(
+  new THREE.PlaneGeometry(w*.985,h*.97),
+  new THREE.MeshBasicMaterial({
+   color:0x168eae,
+   transparent:true,
+   opacity:.045,
+   side:THREE.DoubleSide
+  })
+ );
 
-return mesh;
+ innerFrame.position.copy(mesh.position);
+ innerFrame.position.z-=.015;
+ parent.add(innerFrame);
+
+ mesh.userData.frame=frame;
+ mesh.userData.innerFrame=innerFrame;
+
+ return mesh;
 }
+
 
 // STARFIELD
 const starPos=[];
@@ -316,6 +487,72 @@ for(let i=0;i<6;i++){
 const platformGlow=new THREE.PointLight(0x13cfff,38,13);
 platformGlow.position.set(0,1.4,0);
 platform.add(platformGlow);
+
+// ADVANCED PLATFORM ENERGY SYSTEM
+
+const platformEnergyRings=[];
+
+// ROTATING ENERGY RINGS
+for(let i=0;i<3;i++){
+ const energyRing=new THREE.Mesh(
+  new THREE.TorusGeometry(
+   2.35+i*.48,
+   .025,
+   10,
+   160
+  ),
+  new THREE.MeshBasicMaterial({
+   color:i===1?0x9afaff:0x27cfff,
+   transparent:true,
+   opacity:.75,
+   blending:THREE.AdditiveBlending
+  })
+ );
+
+ energyRing.rotation.x=Math.PI/2;
+ energyRing.position.y=1.18+i*.025;
+
+ platform.add(energyRing);
+ platformEnergyRings.push(energyRing);
+}
+
+// RADIAL ENERGY MARKERS
+for(let i=0;i<48;i++){
+ const angle=i*Math.PI*2/48;
+
+ const marker=new THREE.Mesh(
+  new THREE.BoxGeometry(
+   i%4===0?.16:.07,
+   .025,
+   i%4===0?.42:.2
+  ),
+  new THREE.MeshBasicMaterial({
+   color:i%4===0?0x9cffff:0x25bddd
+  })
+ );
+
+ marker.position.set(
+  Math.cos(angle)*4.45,
+  1.02,
+  Math.sin(angle)*4.45
+ );
+
+ marker.rotation.y=-angle;
+ platform.add(marker);
+}
+
+// ENERGY CENTER
+const energyCore=new THREE.Mesh(
+ new THREE.CylinderGeometry(.55,.85,.045,48),
+ new THREE.MeshBasicMaterial({
+  color:0x8dfaff,
+  transparent:true,
+  opacity:.8
+ })
+);
+
+energyCore.position.y=1.19;
+platform.add(energyCore);
 
 // DETAILED HOLOGRAPHIC EARTH
 const globeGroup=new THREE.Group();
@@ -467,51 +704,288 @@ globeGroup.add(
 );
 
 // Orbital rings
-for(let i=0;i<3;i++){
+// ADVANCED ANIMATED ORBITAL RINGS
+const orbitalRings=[];
+
+for(let i=0;i<5;i++){
  const rr=new THREE.Mesh(
-  new THREE.TorusGeometry(4.05+i*.48,.022,8,180),
+  new THREE.TorusGeometry(
+   4.05+i*.32,
+   i===0?.035:.018,
+   10,
+   220
+  ),
   new THREE.MeshBasicMaterial({
-   color:0x49dfff,
+   color:i%2===0?0x49dfff:0x168cff,
    transparent:true,
-   opacity:.55
+   opacity:i===0?.8:.42
   })
  );
 
- rr.rotation.set(.5+i*.5,.3+i*.6,.2);
+ rr.rotation.set(
+  .45+i*.31,
+  .3+i*.48,
+  .2+i*.22
+ );
+
  globeGroup.add(rr);
+ orbitalRings.push(rr);
+
+ // ORBITING LIGHT
+ const satellite=new THREE.Mesh(
+  new THREE.SphereGeometry(.075,16,16),
+  new THREE.MeshBasicMaterial({
+   color:0x9afaff
+  })
+ );
+
+ rr.add(satellite);
+ satellite.position.set(4.05+i*.32,0,0);
 }
 
-// Earth light
-const globeLight=new THREE.PointLight(0x28dfff,24,12);
+// ADVANCED EARTH LIGHTING
+const globeLight=new THREE.PointLight(0x28dfff,35,22);
 globeLight.position.set(0,1,4);
 globeGroup.add(globeLight);
 
+// SECONDARY CYAN LIGHT
+const secondaryLight=new THREE.PointLight(0x087dff,18,18);
+secondaryLight.position.set(-5,-2,-3);
+globeGroup.add(secondaryLight);
+
+// EARTH ATMOSPHERE GLOW
+const atmosphere=new THREE.Mesh(
+ new THREE.SphereGeometry(4.02,64,48),
+ new THREE.MeshBasicMaterial({
+  color:0x26cfff,
+  transparent:true,
+  opacity:.09,
+  side:THREE.BackSide,
+  blending:THREE.AdditiveBlending,
+  depthWrite:false
+ })
+);
+
+globeGroup.add(atmosphere);
+
+// OUTER ENERGY SHELL
+const outerGlow=new THREE.Mesh(
+ new THREE.SphereGeometry(4.18,48,32),
+ new THREE.MeshBasicMaterial({
+  color:0x087dff,
+  transparent:true,
+  opacity:.035,
+  side:THREE.BackSide,
+  blending:THREE.AdditiveBlending,
+  depthWrite:false
+ })
+);
+
+globeGroup.add(outerGlow);
+
 // holographic screens around globe
 const floating=[];
+// HOLOGRAPHIC SCREEN ARRANGEMENT
 floating.push(makeScreen(world,-7,7,-3,3.5,2.2,"GLOBAL NETWORK"));
 floating.push(makeScreen(world,7,7,-3,3.5,2.2,"LIVE MONITOR"));
 floating.push(makeScreen(world,-8,4,4,3,1.9,"SYSTEM STATUS"));
 floating.push(makeScreen(world,8,4,4,3,1.9,"DATA STREAM"));
 floating.push(makeScreen(world,0,12,-8,4,2.5,"WORLD OVERVIEW"));
 
-// Signal beacons
+// FACE SCREENS TOWARD THE CENTRAL EARTH
+floating.forEach((s)=>{
+ s.lookAt(0,8,0);
+
+ if(s.userData.frame){
+  s.userData.frame.quaternion.copy(s.quaternion);
+ }
+
+ s.userData.baseY=s.position.y;
+});
+
+
+// ADVANCED SIGNAL BEACONS
 const beacons=[];
+
 for(let i=0;i<8;i++){
- const a=i*Math.PI/4,r=10;
- const b=new THREE.Group();b.position.set(Math.cos(a)*r,.2,Math.sin(a)*r);
- const orb=new THREE.Mesh(new THREE.SphereGeometry(.35,20,16),new THREE.MeshBasicMaterial({color:i%3===0?0x4afcff:0x0c9fe5}));
- b.add(orb);ring(b,.65,0,0x43eaff,.025);world.add(b);beacons.push(b);
- const glow=new THREE.PointLight(0x0bcfff,8,5);glow.position.y=1;b.add(glow);
+ const a=i*Math.PI/4;
+ const r=10;
+
+ const b=new THREE.Group();
+ b.position.set(
+  Math.cos(a)*r,
+  .2,
+  Math.sin(a)*r
+ );
+
+ // CENTRAL ENERGY ORB
+ const orb=new THREE.Mesh(
+  new THREE.SphereGeometry(.32,24,20),
+  new THREE.MeshBasicMaterial({
+   color:i%3===0?0x75ffff:0x0c9fe5
+  })
+ );
+
+ b.add(orb);
+
+ // INNER GLOW
+ const glowSphere=new THREE.Mesh(
+  new THREE.SphereGeometry(.52,20,16),
+  new THREE.MeshBasicMaterial({
+   color:0x20dfff,
+   transparent:true,
+   opacity:.12,
+   side:THREE.BackSide,
+   blending:THREE.AdditiveBlending
+  })
+ );
+
+ b.add(glowSphere);
+
+ // ENERGY COLUMN
+ const column=new THREE.Mesh(
+  new THREE.CylinderGeometry(.025,.12,3.5,12,1,true),
+  new THREE.MeshBasicMaterial({
+   color:0x24dfff,
+   transparent:true,
+   opacity:.2,
+   side:THREE.DoubleSide,
+   blending:THREE.AdditiveBlending
+  })
+ );
+
+ column.position.y=1.8;
+ b.add(column);
+
+ // BASE RINGS
+ const baseRing=ring(b,.65,0,0x43eaff,.025);
+
+ // SIGNAL PULSE
+ const pulse=new THREE.Mesh(
+  new THREE.TorusGeometry(.55,.018,8,64),
+  new THREE.MeshBasicMaterial({
+   color:0x6afaff,
+   transparent:true,
+   opacity:.8
+  })
+ );
+
+ pulse.rotation.x=Math.PI/2;
+ pulse.position.y=.1;
+ b.add(pulse);
+
+ const glow=new THREE.PointLight(0x0bcfff,10,7);
+ glow.position.y=1;
+ b.add(glow);
+
+ world.add(b);
+
+ beacons.push({
+  group:b,
+  orb,
+  glowSphere,
+  column,
+  pulse,
+  glow
+ });
 }
 
+
 // Surrounding data towers
+
+// ADVANCED HOLOGRAPHIC DATA TOWERS
+const dataTowers=[];
+
 for(let i=0;i<22;i++){
- const a=i*Math.PI*2/22,r=15+Math.random()*4,h=2+Math.random()*5;
- const x=Math.cos(a)*r,z=Math.sin(a)*r;
- const geo=new THREE.EdgesGeometry(new THREE.BoxGeometry(.8,h,.8));
- const wire=new THREE.LineSegments(geo,new THREE.LineBasicMaterial({color:0x168eb0,transparent:true,opacity:.65}));
- wire.position.set(x,h/2,z);world.add(wire);
+ const a=i*Math.PI*2/22;
+ const r=15+Math.random()*4;
+ const h=2+Math.random()*5;
+
+ const x=Math.cos(a)*r;
+ const z=Math.sin(a)*r;
+
+ const tower=new THREE.Group();
+ tower.position.set(x,0,z);
+
+ // MAIN STRUCTURE
+ const geometry=new THREE.BoxGeometry(.8,h,.8);
+ const edges=new THREE.EdgesGeometry(geometry);
+
+ const wire=new THREE.LineSegments(
+  edges,
+  new THREE.LineBasicMaterial({
+   color:0x168eb0,
+   transparent:true,
+   opacity:.8
+  })
+ );
+
+ wire.position.y=h/2;
+ tower.add(wire);
+
+ // CENTRAL ENERGY CORE
+ const core=new THREE.Mesh(
+  new THREE.BoxGeometry(.22,h*.72,.22),
+  new THREE.MeshBasicMaterial({
+   color:0x20cfff,
+   transparent:true,
+   opacity:.28
+  })
+ );
+
+ core.position.y=h/2;
+ tower.add(core);
+
+ // TOP SIGNAL LIGHT
+ const light=new THREE.Mesh(
+  new THREE.SphereGeometry(.12,12,12),
+  new THREE.MeshBasicMaterial({
+   color:0x8bffff
+  })
+ );
+
+ light.position.y=h+.12;
+ tower.add(light);
+
+ // TOP PLATFORM
+ const cap=new THREE.Mesh(
+  new THREE.BoxGeometry(1.05,.09,1.05),
+  new THREE.MeshBasicMaterial({
+   color:0x24cfff,
+   transparent:true,
+   opacity:.65
+  })
+ );
+
+ cap.position.y=h;
+ tower.add(cap);
+
+ // BASE
+ const base=new THREE.Mesh(
+  new THREE.BoxGeometry(1.1,.12,1.1),
+  new THREE.MeshBasicMaterial({
+   color:0x087d9e
+  })
+ );
+
+ base.position.y=.06;
+ tower.add(base);
+
+ const glow=new THREE.PointLight(0x12bfff,2,3);
+ glow.position.y=h;
+ tower.add(glow);
+
+ world.add(tower);
+
+ dataTowers.push({
+  tower,
+  light,
+  glow,
+  height:h,
+  phase:i
+ });
 }
+
 
 // 2. COMMAND CENTER
 const roomFloor=new THREE.Mesh(new THREE.CylinderGeometry(19,19,.35,64),M(0x061522,0x041d2d));
@@ -574,23 +1048,240 @@ for(let i=0;i<3;i++){
  const m=makeScreen(office,-10+i*10,5,-9,4,2.3,"LIVE OPERATIONS");
 }
 
-// 4. CITY HOLOGRAM
+
+// 4. ADVANCED HOLOGRAPHIC CITY
 grid(city,90,75);
-const cityBase=new THREE.Mesh(new THREE.CylinderGeometry(17,19,.5,48),M(0x06243a,0x07506a));
-cityBase.position.y=-.25;city.add(cityBase);
+
+const cityBase=new THREE.Mesh(
+ new THREE.CylinderGeometry(17,19,.5,64),
+ M(0x06243a,0x07506a)
+);
+
+cityBase.position.y=-.25;
+city.add(cityBase);
+
 ring(city,17,.05,0x50eaff,.06);
-for(let i=0;i<85;i++){
- const x=(Math.random()-.5)*29,z=(Math.random()-.5)*29;
- const h=1+Math.random()*7,w=.4+Math.random()*.8;
- const building=addBox(city,w,h,w,x,h/2,z,M(0x07516b,0x087d9b));
- const edge=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(w,h,w)),new THREE.LineBasicMaterial({color:0x36dfff,transparent:true,opacity:.75}));
- edge.position.copy(building.position);city.add(edge);
- if(i%3===0){
-  addBox(city,w+.1,.06,w+.1,x,h+.05,z,new THREE.MeshBasicMaterial({color:0x46eaff}));
+
+// CITY LIGHT SYSTEM
+const cityLights=[];
+
+// BUILDING GENERATION
+for(let i=0;i<110;i++){
+ const x=(Math.random()-.5)*29;
+ const z=(Math.random()-.5)*29;
+
+ const distance=Math.sqrt(x*x+z*z);
+
+ if(distance<3)continue;
+
+ const h=1.5+Math.random()*9;
+ const w=.45+Math.random()*.9;
+ const d=.45+Math.random()*.9;
+
+ const building=new THREE.Group();
+ building.position.set(x,0,z);
+
+ // MAIN BUILDING
+ const body=new THREE.Mesh(
+  new THREE.BoxGeometry(w,h,d),
+  new THREE.MeshStandardMaterial({
+   color:0x07516b,
+   emissive:0x063c55,
+   emissiveIntensity:.8,
+   metalness:.45,
+   roughness:.3
+  })
+ );
+
+ body.position.y=h/2;
+ building.add(body);
+
+ // BUILDING EDGES
+ const edge=new THREE.LineSegments(
+  new THREE.EdgesGeometry(
+   new THREE.BoxGeometry(w,h,d)
+  ),
+  new THREE.LineBasicMaterial({
+   color:0x36dfff,
+   transparent:true,
+   opacity:.8
+  })
+ );
+
+ edge.position.y=h/2;
+ building.add(edge);
+
+ // ROOFTOP LIGHT
+ const roof=new THREE.Mesh(
+  new THREE.BoxGeometry(w+.12,.07,d+.12),
+  new THREE.MeshBasicMaterial({
+   color:0x46eaff
+  })
+ );
+
+ roof.position.y=h+.04;
+ building.add(roof);
+
+ // WINDOWS
+ const rows=Math.max(2,Math.floor(h/.65));
+
+ for(let j=0;j<rows;j++){
+  const windowLight=new THREE.Mesh(
+   new THREE.BoxGeometry(w*.65,.09,.025),
+   new THREE.MeshBasicMaterial({
+    color:j%3===0?0x8bffff:0x168ebd
+   })
+  );
+
+  windowLight.position.set(
+   0,
+   .45+j*.6,
+   d/2+.014
+  );
+
+  building.add(windowLight);
  }
+
+ // BUILDING BEACON
+ if(i%5===0){
+  const beacon=new THREE.Mesh(
+   new THREE.SphereGeometry(.09,12,12),
+   new THREE.MeshBasicMaterial({
+    color:0x8effff
+   })
+  );
+
+  beacon.position.y=h+.3;
+  building.add(beacon);
+
+  const light=new THREE.PointLight(0x16cfff,2,4);
+  light.position.y=h+.3;
+  building.add(light);
+
+  cityLights.push({beacon,light,phase:i});
+ }
+
+ city.add(building);
 }
+// CITY HOLOGRAPHIC SCANNER
+const cityScanner=new THREE.Mesh(
+ new THREE.CylinderGeometry(0.15,5.5,7,64,1,true),
+ new THREE.MeshBasicMaterial({
+  color:0x21cfff,
+  transparent:true,
+  opacity:.09,
+  side:THREE.DoubleSide,
+  blending:THREE.AdditiveBlending,
+  depthWrite:false
+ })
+);
+
+cityScanner.position.set(0,3.5,0);
+city.add(cityScanner);
+
+const scannerRing=new THREE.Mesh(
+ new THREE.TorusGeometry(5.5,.035,8,128),
+ new THREE.MeshBasicMaterial({
+  color:0x75f5ff,
+  transparent:true,
+  opacity:.8
+ })
+);
+
+scannerRing.rotation.x=Math.PI/2;
+city.add(scannerRing);
+// CITY ROAD NETWORK
+for(let i=-2;i<=2;i++){
+ const road=new THREE.Mesh(
+  new THREE.BoxGeometry(32,.025,.045),
+  new THREE.MeshBasicMaterial({
+   color:0x20cfff,
+   transparent:true,
+   opacity:.5
+  })
+ );
+
+ road.position.set(0,.08,i*5);
+ city.add(road);
+
+ const crossRoad=new THREE.Mesh(
+  new THREE.BoxGeometry(.045,.025,32),
+  new THREE.MeshBasicMaterial({
+   color:0x20cfff,
+   transparent:true,
+   opacity:.5
+  })
+ );
+
+ crossRoad.position.set(i*5,.085,0);
+ city.add(crossRoad);
+}
+
+// CITY HOLOGRAM SCREENS
 for(let i=0;i<5;i++){
  makeScreen(city,-10+i*5,7,-12,3,1.7,"CITY DATA");
+}
+// CITY ENERGY STREAMS
+const cityStreams=[];
+
+for(let i=0;i<18;i++){
+ const points=[];
+ const angle=i*Math.PI*2/18;
+ const radius=5+Math.random()*8;
+
+ points.push(
+  new THREE.Vector3(
+   Math.cos(angle)*radius,
+   .25,
+   Math.sin(angle)*radius
+  )
+ );
+
+ points.push(
+  new THREE.Vector3(
+   Math.cos(angle+.5)*(radius+3),
+   .35+Math.random()*2,
+   Math.sin(angle+.5)*(radius+3)
+  )
+ );
+
+ points.push(
+  new THREE.Vector3(
+   Math.cos(angle+1)*(radius+5),
+   .25,
+   Math.sin(angle+1)*(radius+5)
+  )
+ );
+
+ const curve=new THREE.CatmullRomCurve3(points);
+
+ const stream=new THREE.Mesh(
+  new THREE.TubeGeometry(curve,48,.025,6,false),
+  new THREE.MeshBasicMaterial({
+   color:0x36dcff,
+   transparent:true,
+   opacity:.65,
+   blending:THREE.AdditiveBlending
+  })
+ );
+
+ city.add(stream);
+
+ const particle=new THREE.Mesh(
+  new THREE.SphereGeometry(.075,10,10),
+  new THREE.MeshBasicMaterial({
+   color:0xb9ffff
+  })
+ );
+
+ city.add(particle);
+
+ cityStreams.push({
+  curve,
+  particle,
+  speed:.08+Math.random()*.12,
+  offset:Math.random()
+ });
 }
 
 // 5. RADAR SCENE
@@ -696,19 +1387,95 @@ camera.position.copy(
 
  // 3D ANIMATIONS
  globeGroup.rotation.y=t*.13;
+ // BREATHING EARTH ATMOSPHERE
+atmosphere.material.opacity=.07+Math.sin(t*1.5)*.025;
+outerGlow.material.opacity=.025+Math.sin(t*1.1)*.012;
+ // ORBITAL RING ANIMATION
+orbitalRings.forEach((ring,i)=>{
+ ring.rotation.z+=.0015*(i%2===0?1:-1);
+ ring.rotation.x+=.0005;
+});
  centerSphere.rotation.y=t*.18;
  platform.rotation.y=Math.sin(t*.25)*.04;
+ // PLATFORM ENERGY ANIMATION
+platformEnergyRings.forEach((r,i)=>{
+ r.rotation.z+=i%2===0?.003:-.002;
+ r.material.opacity=.5+Math.sin(t*2+i)*.25;
+});
+
+energyCore.material.opacity=.55+Math.sin(t*3)*.35;
+energyCore.rotation.y=t*.5;
  sweep.rotation.z=-t*.65;
  stars.rotation.y=t*.002;
 
- beacons.forEach((b,i)=>{
-  b.children[0].position.y=.25+Math.sin(t*2+i)*.2;
-  b.children[0].rotation.y=t+i;
- });
+ // SIGNAL BEACON ANIMATION
+beacons.forEach((b,i)=>{
+ const wave=Math.sin(t*2+i);
 
- floating.forEach((s,i)=>{
-  s.position.y+=(Math.sin(t*.8+i)*.012);
- });
+ b.orb.position.y=.25+wave*.2;
+ b.orb.rotation.y=t+i;
+
+ b.glowSphere.scale.setScalar(
+  1+Math.sin(t*2.5+i)*.12
+ );
+
+ b.column.material.opacity=
+  .12+Math.sin(t*3+i)*.08;
+
+ const pulseScale=1+((t*.65+i*.2)%1)*1.8;
+
+ b.pulse.scale.set(
+  pulseScale,
+  pulseScale,
+  pulseScale
+ );
+
+ b.pulse.material.opacity=
+  1-((t*.65+i*.2)%1);
+
+ b.glow.intensity=8+Math.sin(t*2+i)*3;
+});
+// DATA TOWER LIGHT ANIMATION
+dataTowers.forEach((item)=>{
+ const pulse=.5+.5*Math.sin(t*2+item.phase);
+
+ item.light.material.opacity=.45+pulse*.55;
+ item.glow.intensity=1.5+pulse*3;
+});
+ // CITY BUILDING LIGHT ANIMATION
+cityLights.forEach((item)=>{
+ const glow=.5+.5*Math.sin(t*2+item.phase);
+ item.beacon.material.opacity=.5+glow*.5;
+ item.light.intensity=1+glow*3;
+});
+ // CITY ENERGY STREAM ANIMATION
+cityStreams.forEach((item)=>{
+ item.offset=(item.offset+item.speed*.001)%1;
+
+ const position=item.curve.getPoint(item.offset);
+ item.particle.position.copy(position);
+});
+ // CITY SCANNER ANIMATION
+cityScanner.rotation.y+=.012;
+scannerRing.rotation.z+=.018;
+scannerRing.material.opacity=.4+Math.sin(t*3)*.3;
+ // CITY BUILDING LIGHT ANIMATION
+cityLights.forEach((item)=>{
+ const glow=.5+.5*Math.sin(t*2+item.phase);
+
+ item.beacon.material.opacity=.5+glow*.5;
+ item.light.intensity=1+glow*3;
+});
+// STABLE FLOATING HOLOGRAM ANIMATION
+floating.forEach((s,i)=>{
+  const floatOffset=Math.sin(t*.8+i)*.12;
+
+  s.position.y=s.userData.baseY+floatOffset;
+
+  if(s.userData.frame){
+    s.userData.frame.position.y=s.position.y;
+  }
+});
 
  controls.update();
  renderer.render(scene,camera);
