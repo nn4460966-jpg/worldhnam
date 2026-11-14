@@ -1987,15 +1987,15 @@ cityLightBeams.forEach((item)=>{
 
  item.beam.rotation.y+=.001;
 });
- // CITY BOUNDARY ANIMATION
-boundaryRings.forEach((ring,i)=>{
- ring.rotation.z+=i%2===0?.0015:-.001;
- ring.material.opacity=
-  .18+.15*(.5+.5*Math.sin(t*1.2+i));
+// CITY BOUNDARY ANIMATION
+boundaryRings.forEach((ring, i) => {
+  ring.rotation.z += (i % 2 === 0) ? 0.0015 : -0.001;
+
+  ring.material.opacity =
+    0.18 + 0.15 * (0.5 + 0.5 * Math.sin(t * 1.2 + i));
 });
 
-boundaryLight.intensity=
- 6+Math.sin(t*2)*2;
+boundaryLight.intensity = 6 + Math.sin(t * 2) * 2;
  // CITY BUILDING LIGHT ANIMATION
 cityLights.forEach((item)=>{
  const glow=.5+.5*Math.sin(t*2+item.phase);
