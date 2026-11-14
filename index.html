@@ -227,8 +227,12 @@ function makeScreen(parent,x,y,z,w,h,title){
  const mesh=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({map:texture,side:THREE.DoubleSide}));
  mesh.position.set(x,y,z);parent.add(mesh);
  const frame=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.PlaneGeometry(w,h)),new THREE.LineBasicMaterial({color:0x54eaff}));
- frame.position.copy(mesh.position);parent.add(frame);
- return mesh;
+ frame.position.copy(mesh.position);
+parent.add(frame);
+
+mesh.userData.frame=frame;
+
+return mesh;
 }
 
 // STARFIELD
