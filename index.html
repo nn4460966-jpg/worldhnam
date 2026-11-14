@@ -313,23 +313,174 @@ const platformGlow=new THREE.PointLight(0x13cfff,38,13);
 platformGlow.position.set(0,1.4,0);
 platform.add(platformGlow);
 
-// Globe
-const globeGroup=new THREE.Group();globeGroup.position.set(0,8,0);world.add(globeGroup);
-const globe=new THREE.Mesh(new THREE.SphereGeometry(3.6,56,48),new THREE.MeshBasicMaterial({color:0x32cde9,wireframe:true,transparent:true,opacity:.28}));
+// DETAILED HOLOGRAPHIC EARTH
+const globeGroup=new THREE.Group();
+globeGroup.position.set(0,8,0);
+world.add(globeGroup);
+
+// EARTH SURFACE TEXTURE
+const mapCanvas=document.createElement("canvas");
+mapCanvas.width=2048;
+mapCanvas.height=1024;
+
+const mapCtx=mapCanvas.getContext("2d");
+
+const ocean=mapCtx.createLinearGradient(0,0,0,1024);
+ocean.addColorStop(0,"#06283e");
+ocean.addColorStop(.48,"#0b6682");
+ocean.addColorStop(1,"#031d35");
+
+mapCtx.fillStyle=ocean;
+mapCtx.fillRect(0,0,2048,1024);
+
+// Coordinate grid
+mapCtx.strokeStyle="rgba(104,235,255,.22)";
+mapCtx.lineWidth=2;
+
+for(let lon=0;lon<=360;lon+=15){
+ const x=lon/360*2048;
+ mapCtx.beginPath();
+ mapCtx.moveTo(x,0);
+ mapCtx.lineTo(x,1024);
+ mapCtx.stroke();
+}
+
+for(let lat=0;lat<=180;lat+=15){
+ const y=lat/180*1024;
+ mapCtx.beginPath();
+ mapCtx.moveTo(0,y);
+ mapCtx.lineTo(2048,y);
+ mapCtx.stroke();
+}
+
+// Stylized continents
+const landShapes=[
+ [[.08,.24],[.13,.18],[.19,.2],[.22,.27],[.2,.34],[.16,.37],[.15,.46],[.11,.43],[.09,.34]],
+ [[.19,.47],[.23,.49],[.25,.57],[.23,.68],[.21,.78],[.18,.7],[.17,.59]],
+ [[.39,.22],[.44,.18],[.49,.22],[.52,.3],[.49,.36],[.46,.34],[.44,.42],[.41,.38],[.39,.3]],
+ [[.46,.39],[.51,.4],[.54,.48],[.52,.58],[.49,.66],[.46,.61],[.44,.5]],
+ [[.53,.2],[.59,.17],[.64,.2],[.67,.27],[.64,.34],[.6,.35],[.58,.29],[.54,.3]],
+ [[.59,.39],[.64,.37],[.69,.42],[.7,.5],[.67,.56],[.63,.53],[.61,.47]],
+ [[.72,.2],[.79,.19],[.84,.24],[.82,.31],[.77,.33],[.73,.29]],
+ [[.78,.48],[.82,.45],[.85,.5],[.83,.57],[.8,.56]]
+];
+
+mapCtx.fillStyle="#42d4d9";
+mapCtx.strokeStyle="#a2fbff";
+mapCtx.lineWidth=4;
+
+for(const shape of landShapes){
+ mapCtx.beginPath();
+
+ shape.forEach((p,i)=>{
+  const x=p[0]*2048;
+  const y=p[1]*1024;
+
+  if(i===0) mapCtx.moveTo(x,y);
+  else mapCtx.lineTo(x,y);
+ });
+
+ mapCtx.closePath();
+ mapCtx.fill();
+ mapCtx.stroke();
+}
+
+// Apply texture to sphere
+const mapTexture=new THREE.CanvasTexture(mapCanvas);
+mapTexture.colorSpace=THREE.SRGBColorSpace;
+
+const globe=new THREE.Mesh(
+ new THREE.SphereGeometry(3.55,96,72),
+ new THREE.MeshStandardMaterial({
+  map:mapTexture,
+  emissive:0x063c50,
+  emissiveIntensity:.55,
+  metalness:.18,
+  roughness:.62
+ })
+);
+
 globeGroup.add(globe);
-const solid=new THREE.Mesh(new THREE.SphereGeometry(3.52,48,40),new THREE.MeshBasicMaterial({color:0x08769c,transparent:true,opacity:.12}));
-globeGroup.add(solid);
+
+// Fine holographic grid
+const gridGlobe=new THREE.Mesh(
+ new THREE.SphereGeometry(3.575,36,24),
+ new THREE.MeshBasicMaterial({
+  color:0x8af5ff,
+  wireframe:true,
+  transparent:true,
+  opacity:.11
+ })
+);
+
+globeGroup.add(gridGlobe);
+
+// Atmospheric glow
+const atmosphere=new THREE.Mesh(
+ new THREE.SphereGeometry(3.78,64,48),
+ new THREE.MeshBasicMaterial({
+  color:0x39dfff,
+  transparent:true,
+  opacity:.075,
+  side:THREE.BackSide
+ })
+);
+
+globeGroup.add(atmosphere);
+
+// Floating light particles
 const gp=[];
-for(let i=0;i<1800;i++){
- const y=1-2*(i+.5)/1800,r=Math.sqrt(1-y*y),a=i*2.39996;
- gp.push(3.62*Math.cos(a)*r,3.62*y,3.62*Math.sin(a)*r);
+
+for(let i=0;i<2600;i++){
+ const y=1-2*(i+.5)/2600;
+ const r=Math.sqrt(1-y*y);
+ const a=i*2.39996;
+
+ gp.push(
+  3.59*Math.cos(a)*r,
+  3.59*y,
+  3.59*Math.sin(a)*r
+ );
 }
-const gg=new THREE.BufferGeometry();gg.setAttribute("position",new THREE.Float32BufferAttribute(gp,3));
-globeGroup.add(new THREE.Points(gg,new THREE.PointsMaterial({color:0x85f8ff,size:.045})));
+
+const gg=new THREE.BufferGeometry();
+
+gg.setAttribute(
+ "position",
+ new THREE.Float32BufferAttribute(gp,3)
+);
+
+globeGroup.add(
+ new THREE.Points(
+  gg,
+  new THREE.PointsMaterial({
+   color:0xb2fbff,
+   size:.025,
+   transparent:true,
+   opacity:.8
+  })
+ )
+);
+
+// Orbital rings
 for(let i=0;i<3;i++){
- const rr=new THREE.Mesh(new THREE.TorusGeometry(4.2+i*.4,.025,8,160),new THREE.MeshBasicMaterial({color:0x49dfff,transparent:true,opacity:.7}));
- rr.rotation.set(.5+i*.5,.3+i*.6,.2);globeGroup.add(rr);
+ const rr=new THREE.Mesh(
+  new THREE.TorusGeometry(4.05+i*.48,.022,8,180),
+  new THREE.MeshBasicMaterial({
+   color:0x49dfff,
+   transparent:true,
+   opacity:.55
+  })
+ );
+
+ rr.rotation.set(.5+i*.5,.3+i*.6,.2);
+ globeGroup.add(rr);
 }
+
+// Earth light
+const globeLight=new THREE.PointLight(0x28dfff,24,12);
+globeLight.position.set(0,1,4);
+globeGroup.add(globeLight);
 
 // holographic screens around globe
 const floating=[];
