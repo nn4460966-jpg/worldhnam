@@ -656,19 +656,20 @@ const gridGlobe=new THREE.Mesh(
 
 globeGroup.add(gridGlobe);
 
-// Atmospheric glow
-const atmosphere=new THREE.Mesh(
- new THREE.SphereGeometry(3.78,64,48),
+// EARTH ATMOSPHERE GLOW - OUTER LAYER
+const outerAtmosphere=new THREE.Mesh(
+ new THREE.SphereGeometry(4.02,64,48),
  new THREE.MeshBasicMaterial({
-  color:0x39dfff,
+  color:0x26cfff,
   transparent:true,
-  opacity:.075,
-  side:THREE.BackSide
+  opacity:.09,
+  side:THREE.BackSide,
+  blending:THREE.AdditiveBlending,
+  depthWrite:false
  })
 );
 
-globeGroup.add(atmosphere);
-
+globeGroup.add(outerAtmosphere);
 // Floating light particles
 const gp=[];
 
