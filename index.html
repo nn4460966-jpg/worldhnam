@@ -243,16 +243,75 @@ grid(world,100,85);
 const floor=new THREE.Mesh(new THREE.CircleGeometry(26,80),new THREE.MeshBasicMaterial({color:0x041827,transparent:true,opacity:.35}));
 floor.rotation.x=-Math.PI/2;floor.position.y=-.1;world.add(floor);
 
-// Hexagonal glowing platform
+// MULTI-LAYER HEXAGONAL HOLOGRAPHIC PLATFORM
 const platform=new THREE.Group();world.add(platform);
-const base=new THREE.Mesh(new THREE.CylinderGeometry(5.2,6,1,6),M(0x07506c,0x087fa8));
-base.position.y=.4;base.rotation.y=Math.PI/6;platform.add(base);
-const top=new THREE.Mesh(new THREE.CylinderGeometry(4.8,5.2,.16,6),M(0x087b9a,0x12d5f4));
-top.position.y=1;top.rotation.y=Math.PI/6;platform.add(top);
-ring(platform,5.1,1.1,0x65f5ff,.075);
-ring(platform,6.4,.05,0x1da9d1,.045);
-const inner=new THREE.Mesh(new THREE.CylinderGeometry(1.7,2.2,.12,6),M(0x0c8eae,0x1cdfff));
-inner.position.y=1.2;platform.add(inner);
+
+const lowerDeck=new THREE.Mesh(
+ new THREE.CylinderGeometry(5.9,6.5,.42,6),
+ M(0x031c30,0x063c59)
+);
+lowerDeck.position.y=.12;
+lowerDeck.rotation.y=Math.PI/6;
+platform.add(lowerDeck);
+
+const bevelDeck=new THREE.Mesh(
+ new THREE.CylinderGeometry(5.55,5.95,.42,6),
+ M(0x07506c,0x087fa8)
+);
+bevelDeck.position.y=.48;
+bevelDeck.rotation.y=Math.PI/6;
+platform.add(bevelDeck);
+
+const upperDeck=new THREE.Mesh(
+ new THREE.CylinderGeometry(5.15,5.55,.18,6),
+ M(0x0a526d,0x0b9cbd)
+);
+upperDeck.position.y=.78;
+upperDeck.rotation.y=Math.PI/6;
+platform.add(upperDeck);
+
+const deckSurface=new THREE.Mesh(
+ new THREE.CylinderGeometry(4.9,5.15,.08,6),
+ new THREE.MeshStandardMaterial({
+  color:0x126d88,
+  emissive:0x087d9c,
+  emissiveIntensity:.65,
+  metalness:.35,
+  roughness:.24
+ })
+);
+deckSurface.position.y=.91;
+deckSurface.rotation.y=Math.PI/6;
+platform.add(deckSurface);
+
+ring(platform,5.18,.99,0x83f7ff,.065);
+ring(platform,5.85,.34,0x25c9f0,.045);
+ring(platform,6.55,-.08,0x117da5,.035);
+
+const inner=new THREE.Mesh(
+ new THREE.CylinderGeometry(1.85,2.25,.16,12),
+ M(0x0c8eae,0x1cdfff)
+);
+inner.position.y=1.05;
+platform.add(inner);
+
+for(let i=0;i<6;i++){
+ const a=i*Math.PI/3;
+
+ const rail=addBox(
+  platform,.12,.08,1.25,
+  Math.cos(a)*3.85,
+  1.02,
+  Math.sin(a)*3.85,
+  new THREE.MeshBasicMaterial({color:0x70f5ff})
+ );
+
+ rail.rotation.y=-a;
+}
+
+const platformGlow=new THREE.PointLight(0x13cfff,38,13);
+platformGlow.position.set(0,1.4,0);
+platform.add(platformGlow);
 
 // Globe
 const globeGroup=new THREE.Group();globeGroup.position.set(0,8,0);world.add(globeGroup);
