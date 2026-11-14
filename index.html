@@ -1064,6 +1064,7 @@ ring(city,17,.05,0x50eaff,.06);
 
 // CITY LIGHT SYSTEM
 const cityLights=[];
+const cityFloorLights=[];
 
 // BUILDING GENERATION
 for(let i=0;i<110;i++){
@@ -1122,14 +1123,17 @@ for(let i=0;i<110;i++){
  roof.position.y=h+.04;
  building.add(roof);
 
- // WINDOWS
+  // MULTI-FLOOR HOLOGRAPHIC WINDOWS
  const rows=Math.max(2,Math.floor(h/.65));
+ const floorLights=[];
 
  for(let j=0;j<rows;j++){
   const windowLight=new THREE.Mesh(
    new THREE.BoxGeometry(w*.65,.09,.025),
    new THREE.MeshBasicMaterial({
-    color:j%3===0?0x8bffff:0x168ebd
+    color:j%3===0?0x8bffff:0x168ebd,
+    transparent:true,
+    opacity:.65
    })
   );
 
@@ -1140,8 +1144,14 @@ for(let i=0;i<110;i++){
   );
 
   building.add(windowLight);
+  floorLights.push(windowLight);
  }
 
+ building.userData.floorLights=floorLights;
+cityFloorLights.push({
+ lights:floorLights,
+ phase:Math.random()*Math.PI*2
+});
  // BUILDING BEACON
  if(i%5===0){
   const beacon=new THREE.Mesh(
@@ -1217,6 +1227,341 @@ for(let i=0;i<28;i++){
   phase:Math.random()*Math.PI*2
  });
 }
+ // CITY FLYING DRONES
+const cityDrones=[];
+
+for(let i=0;i<8;i++){
+ const drone=new THREE.Group();
+
+ const core=new THREE.Mesh(
+  new THREE.OctahedronGeometry(.16,1),
+  new THREE.MeshBasicMaterial({
+   color:0x8ffaff
+  })
+ );
+
+ drone.add(core);
+
+ const glow=new THREE.PointLight(0x19cfff,3,5);
+ drone.add(glow);
+
+ const ring=new THREE.Mesh(
+  new THREE.TorusGeometry(.28,.018,8,32),
+  new THREE.MeshBasicMaterial({
+   color:0x36eaff,
+   transparent:true,
+   opacity:.8
+  })
+ );
+
+ ring.rotation.x=Math.PI/2;
+ drone.add(ring);
+
+ city.add(drone);
+
+const trailPoints=[];
+
+for(let j=0;j<24;j++){
+ trailPoints.push(new THREE.Vector3(0,0,0));
+}
+
+const trailGeometry=new THREE.BufferGeometry().setFromPoints(trailPoints);
+
+const trailMaterial=new THREE.LineBasicMaterial({
+ color:0x36eaff,
+ transparent:true,
+ opacity:.55
+});
+
+const trail=new THREE.Line(trailGeometry,trailMaterial);
+city.add(trail);
+
+cityDrones.push({
+ drone,
+ trail,
+ trailGeometry,
+ trailPoints,
+ angle:i*Math.PI/4,
+ radius:5+Math.random()*8,
+ height:3+Math.random()*5,
+ speed:.12+Math.random()*.1
+});
+}
+ // CITY CENTRAL ENERGY GATE
+const cityGate=new THREE.Group();
+cityGate.position.set(0,2,0);
+city.add(cityGate);
+
+const gateRings=[];
+
+for(let i=0;i<4;i++){
+ const ring=new THREE.Mesh(
+  new THREE.TorusGeometry(
+   2.1+i*.38,
+   .035,
+   10,
+   128
+  ),
+  new THREE.MeshBasicMaterial({
+   color:i%2===0?0x39eaff:0x9afaff,
+   transparent:true,
+   opacity:.7,
+   blending:THREE.AdditiveBlending
+  })
+ );
+
+ ring.rotation.x=Math.PI/2;
+ ring.rotation.y=i*.35;
+ cityGate.add(ring);
+ gateRings.push(ring);
+}
+
+const gateCore=new THREE.PointLight(0x19dfff,12,12);
+gateCore.position.set(0,0,0);
+cityGate.add(gateCore);
+ // CITY ENERGY PARTICLES
+const cityParticles=[];
+const particleGeometry=new THREE.SphereGeometry(.035,8,8);
+
+for(let i=0;i<180;i++){
+ const particle=new THREE.Mesh(
+  particleGeometry,
+  new THREE.MeshBasicMaterial({
+   color:i%3===0?0x9cffff:0x20cfff,
+   transparent:true,
+   opacity:.7
+  })
+ );
+
+ const radius=4+Math.random()*17;
+
+ particle.position.set(
+  (Math.random()-.5)*30,
+  Math.random()*12,
+  (Math.random()-.5)*30
+ );
+
+ city.add(particle);
+
+ cityParticles.push({
+  particle,
+  speed:.3+Math.random()*.8,
+  phase:Math.random()*Math.PI*2,
+  radius
+ });
+}
+ // CITY RADAR SCANNER
+const cityRadar=new THREE.Group();
+cityRadar.position.y=8;
+city.add(cityRadar);
+
+const radarCircle=new THREE.Mesh(
+ new THREE.RingGeometry(7.8,8,128),
+ new THREE.MeshBasicMaterial({
+  color:0x45eaff,
+  transparent:true,
+  opacity:.7,
+  side:THREE.DoubleSide
+ })
+);
+
+radarCircle.rotation.x=-Math.PI/2;
+cityRadar.add(radarCircle);
+
+const radarSweep=new THREE.Mesh(
+ new THREE.CircleGeometry(7.8,64,0,Math.PI/5),
+ new THREE.MeshBasicMaterial({
+  color:0x39eaff,
+  transparent:true,
+  opacity:.22,
+  side:THREE.DoubleSide,
+  depthWrite:false
+ })
+);
+
+radarSweep.rotation.x=-Math.PI/2;
+radarSweep.position.y=.015;
+cityRadar.add(radarSweep);
+
+const radarLine=new THREE.Mesh(
+ new THREE.BoxGeometry(7.8,.025,.035),
+ new THREE.MeshBasicMaterial({
+  color:0x9cffff,
+  transparent:true,
+  opacity:.9
+ })
+);
+
+radarLine.position.x=3.9;
+cityRadar.add(radarLine);
+// CITY HOLOGRAPHIC LAYERS
+const cityLayers=[];
+
+for(let i=0;i<5;i++){
+ const layer=new THREE.Mesh(
+  new THREE.TorusGeometry(
+   11+i*1.5,
+   .018,
+   8,
+   160
+  ),
+  new THREE.MeshBasicMaterial({
+   color:i%2===0?0x28dfff:0x8afaff,
+   transparent:true,
+   opacity:.35
+  })
+ );
+
+ layer.position.y=1+i*2.2;
+ layer.rotation.x=Math.PI/2;
+ city.add(layer);
+
+ cityLayers.push({
+  layer,
+  speed:i%2===0?.002:-.0015
+ });
+}
+ // CITY CENTRAL ENERGY PILLAR
+const cityPillar=new THREE.Group();
+cityPillar.position.set(0,5,0);
+city.add(cityPillar);
+
+const pillar=new THREE.Mesh(
+ new THREE.CylinderGeometry(.12,.65,10,32,1,true),
+ new THREE.MeshBasicMaterial({
+  color:0x27dfff,
+  transparent:true,
+  opacity:.16,
+  side:THREE.DoubleSide,
+  blending:THREE.AdditiveBlending,
+  depthWrite:false
+ })
+);
+
+cityPillar.add(pillar);
+
+const pillarCore=new THREE.Mesh(
+ new THREE.CylinderGeometry(.045,.045,10,16),
+ new THREE.MeshBasicMaterial({
+  color:0xb8ffff,
+  transparent:true,
+  opacity:.8
+ })
+);
+
+cityPillar.add(pillarCore);
+
+const pillarRings=[];
+
+for(let i=0;i<6;i++){
+ const ring=new THREE.Mesh(
+  new THREE.TorusGeometry(1+i*.35,.025,8,64),
+  new THREE.MeshBasicMaterial({
+   color:0x62efff,
+   transparent:true,
+   opacity:.65
+  })
+ );
+
+ ring.position.y=-4+i*1.6;
+ cityPillar.add(ring);
+ pillarRings.push(ring);
+}
+ // CITY PORTAL SYSTEM
+const cityPortal=new THREE.Group();
+cityPortal.position.set(0,6,-9);
+cityPortal.rotation.y=Math.PI/2;
+city.add(cityPortal);
+
+const portalRings=[];
+
+for(let i=0;i<3;i++){
+ const portalRing=new THREE.Mesh(
+  new THREE.TorusGeometry(2+i*.45,.035,12,128),
+  new THREE.MeshBasicMaterial({
+   color:i===1?0xa4ffff:0x28dfff,
+   transparent:true,
+   opacity:.75,
+   blending:THREE.AdditiveBlending
+  })
+ );
+
+ portalRing.rotation.y=Math.PI/2;
+ portalRing.rotation.x=i*.25;
+ cityPortal.add(portalRing);
+ portalRings.push(portalRing);
+}
+
+const portalCore=new THREE.Mesh(
+ new THREE.CircleGeometry(1.9,64),
+ new THREE.MeshBasicMaterial({
+  color:0x16bfe9,
+  transparent:true,
+  opacity:.12,
+  side:THREE.DoubleSide,
+  depthWrite:false
+ })
+);
+
+portalCore.rotation.y=Math.PI/2;
+cityPortal.add(portalCore);
+ // CITY VOLUMETRIC LIGHTS
+const cityLightBeams=[];
+
+for(let i=0;i<12;i++){
+ const beam=new THREE.Mesh(
+  new THREE.CylinderGeometry(.08,.8,12,16,1,true),
+  new THREE.MeshBasicMaterial({
+   color:0x25dfff,
+   transparent:true,
+   opacity:.055,
+   side:THREE.DoubleSide,
+   blending:THREE.AdditiveBlending,
+   depthWrite:false
+  })
+ );
+
+ const angle=i*Math.PI*2/12;
+ const radius=7+Math.random()*6;
+
+ beam.position.set(
+  Math.cos(angle)*radius,
+  6,
+  Math.sin(angle)*radius
+ );
+
+ city.add(beam);
+
+ cityLightBeams.push({
+  beam,
+  phase:Math.random()*Math.PI*2
+ });
+}
+ // CITY HOLOGRAPHIC BOUNDARY
+const cityBoundary=new THREE.Group();
+city.add(cityBoundary);
+
+const boundaryRings=[];
+
+for(let i=0;i<4;i++){
+ const ring=new THREE.Mesh(
+  new THREE.TorusGeometry(17+i*.7,.018,6,160),
+  new THREE.MeshBasicMaterial({
+   color:0x27cfff,
+   transparent:true,
+   opacity:.3
+  })
+ );
+
+ ring.position.y=i*3;
+ ring.rotation.x=Math.PI/2;
+ cityBoundary.add(ring);
+ boundaryRings.push(ring);
+}
+
+const boundaryLight=new THREE.PointLight(0x16cfff,8,35);
+boundaryLight.position.set(0,10,0);
+cityBoundary.add(boundaryLight);
  // CITY ROAD NETWORK
 for(let i=-2;i<=2;i++){
  const road=new THREE.Mesh(
@@ -1243,7 +1588,58 @@ for(let i=-2;i<=2;i++){
  crossRoad.position.set(i*5,.085,0);
  city.add(crossRoad);
 }
+// CITY DATA CONNECTIONS
+const cityConnections=[];
 
+for(let i=0;i<35;i++){
+ const start=new THREE.Vector3(
+  (Math.random()-.5)*25,
+  1+Math.random()*5,
+  (Math.random()-.5)*25
+ );
+
+ const end=new THREE.Vector3(
+  (Math.random()-.5)*25,
+  1+Math.random()*5,
+  (Math.random()-.5)*25
+ );
+
+ const curve=new THREE.QuadraticBezierCurve3(
+  start,
+  new THREE.Vector3(
+   (start.x+end.x)/2,
+   5+Math.random()*5,
+   (start.z+end.z)/2
+  ),
+  end
+ );
+
+ const line=new THREE.Mesh(
+  new THREE.TubeGeometry(curve,32,.012,5,false),
+  new THREE.MeshBasicMaterial({
+   color:0x28dfff,
+   transparent:true,
+   opacity:.35,
+   blending:THREE.AdditiveBlending
+  })
+ );
+
+ city.add(line);
+
+ const signal=new THREE.Mesh(
+  new THREE.SphereGeometry(.065,8,8),
+  new THREE.MeshBasicMaterial({color:0xc5ffff})
+ );
+
+ city.add(signal);
+
+ cityConnections.push({
+  curve,
+  signal,
+  progress:Math.random(),
+  speed:.08+Math.random()*.12
+ });
+}
 // CITY HOLOGRAM SCREENS
 for(let i=0;i<5;i++){
  makeScreen(city,-10+i*5,7,-12,3,1.7,"CITY DATA");
@@ -1475,6 +1871,15 @@ cityLights.forEach((item)=>{
  item.beacon.material.opacity=.5+glow*.5;
  item.light.intensity=1+glow*3;
 });
+ // CITY FLOOR LIGHT ANIMATION
+cityFloorLights.forEach((item)=>{
+ const pulse=.45+.35*(.5+.5*Math.sin(t*2.5+item.phase));
+
+ item.lights.forEach((light,j)=>{
+  light.material.opacity=pulse+
+   .08*Math.sin(t*3+j+item.phase);
+ });
+});
  // CITY ENERGY STREAM ANIMATION
 cityStreams.forEach((item)=>{
  item.offset=(item.offset+item.speed*.001)%1;
@@ -1486,6 +1891,111 @@ cityStreams.forEach((item)=>{
 cityScanner.rotation.y+=.012;
 scannerRing.rotation.z+=.018;
 scannerRing.material.opacity=.4+Math.sin(t*3)*.3;
+ // CITY VERTICAL BEAM ANIMATION
+cityBeams.forEach((item)=>{
+ item.beam.material.opacity=
+  .12+.2*(.5+.5*Math.sin(t*2+item.phase));
+});
+// CITY DRONE ANIMATION
+cityDrones.forEach((item)=>{
+ item.angle+=item.speed*.01;
+
+ item.drone.position.set(
+  Math.cos(item.angle)*item.radius,
+  item.height+Math.sin(t*2+item.angle)*.35,
+  Math.sin(item.angle)*item.radius
+ );
+
+ item.drone.rotation.y=-item.angle;
+
+ item.trailPoints.unshift(item.drone.position.clone());
+
+ if(item.trailPoints.length>24){
+  item.trailPoints.pop();
+ }
+
+ item.trailGeometry.setFromPoints(item.trailPoints);
+});
+ // CITY ENERGY GATE ANIMATION
+gateRings.forEach((ring,i)=>{
+ ring.rotation.z+=i%2===0?.008:-.006;
+ ring.material.opacity=.45+Math.sin(t*2+i)*.2;
+});
+
+gateCore.intensity=9+Math.sin(t*2.5)*3;
+cityGate.rotation.y+=.0015;
+ // CITY PARTICLE ANIMATION
+cityParticles.forEach((item)=>{
+ const p=item.particle;
+
+ p.position.y+=item.speed*.012;
+ p.position.x+=Math.sin(t+item.phase)*.003;
+
+ if(p.position.y>12){
+  p.position.y=.1;
+ }
+
+ p.material.opacity=
+  .25+.65*(.5+.5*Math.sin(t*2+item.phase));
+});
+ // CITY DATA CONNECTION ANIMATION
+cityConnections.forEach((item)=>{
+ item.progress=(item.progress+item.speed*.001)%1;
+
+ item.signal.position.copy(
+  item.curve.getPoint(item.progress)
+ );
+});
+ // CITY RADAR ANIMATION
+radarSweep.rotation.z-=.018;
+radarLine.rotation.y+=.018;
+radarCircle.material.opacity=.45+Math.sin(t*2)*.2;
+ // CITY HOLOGRAPHIC LAYER ANIMATION
+cityLayers.forEach((item,i)=>{
+ item.layer.rotation.z+=item.speed;
+ item.layer.material.opacity=
+  .2+.2*(.5+.5*Math.sin(t*1.5+i));
+});
+ // CITY ENERGY PILLAR ANIMATION
+cityPillar.rotation.y+=.002;
+
+pillar.material.opacity=
+ .1+.08*(.5+.5*Math.sin(t*2));
+
+pillarCore.material.opacity=
+ .55+.35*(.5+.5*Math.sin(t*3));
+
+pillarRings.forEach((ring,i)=>{
+ ring.rotation.y+=.012;
+ ring.rotation.x=Math.sin(t+i)*.15;
+});
+ // CITY PORTAL ANIMATION
+cityPortal.rotation.y+=.002;
+
+portalRings.forEach((ring,i)=>{
+ ring.rotation.z+=i%2===0?.012:-.009;
+ ring.material.opacity=
+  .45+.25*(.5+.5*Math.sin(t*2+i));
+});
+
+portalCore.material.opacity=
+ .07+.08*(.5+.5*Math.sin(t*3));
+ // CITY VOLUMETRIC LIGHT ANIMATION
+cityLightBeams.forEach((item)=>{
+ item.beam.material.opacity=
+  .025+.045*(.5+.5*Math.sin(t*1.5+item.phase));
+
+ item.beam.rotation.y+=.001;
+});
+ // CITY BOUNDARY ANIMATION
+boundaryRings.forEach((ring,i)=>{
+ ring.rotation.z+=i%2===0?.0015:-.001;
+ ring.material.opacity=
+  .18+.15*(.5+.5*Math.sin(t*1.2+i));
+});
+
+boundaryLight.intensity=
+ 6+Math.sin(t*2)*2;
  // CITY BUILDING LIGHT ANIMATION
 cityLights.forEach((item)=>{
  const glow=.5+.5*Math.sin(t*2+item.phase);
